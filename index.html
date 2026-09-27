@@ -1599,6 +1599,7 @@ function showVocabBook(){
 }
 
 var engClickTimer=null;
+var engDown=null;
 function engOptWordGuard(e){
   // 选项内点击：落在英文单词上 → 阻止答题、弹词卡；否则放行正常答题
   if(!document.body.classList.contains('eng-word-mode')) return;
@@ -1620,6 +1621,7 @@ function engOptWordGuard(e){
     engClickTimer=setTimeout(function(){ engPopWord(cx,cy); engBubbleSource='click'; }, 260);
   }
 }
+function engDownMark(e){ engDown={x:e.clientX,y:e.clientY}; }
 function engWordClick(e){
   var t=e.target;
   if(t&&t.closest){
@@ -1637,8 +1639,11 @@ function engWordClick(e){
   if(!pv) return;
   if(t&&t.closest&&t.closest('button,.action-btn,.opt,.pos-velcro')) return;
   if(e.detail===1){
+    // 拖选句子（段落翻译）：保留选择，不查词
+    if(engDown&&(Math.abs(e.clientX-engDown.x)>12||Math.abs(e.clientY-engDown.y)>12)) return;
     // 点击式查词：点一下弹词卡、再点同一词收起；双击由 dblclick 接管防双弹
     clearTimeout(engClickTimer);
+    clearEngSelection(); // 立即清除点击默认产生的选择高亮，避免全屏闪烁
     var cx=e.clientX, cy=e.clientY;
     engClickTimer=setTimeout(function(){
       var w=wordFromEvent({clientX:cx,clientY:cy});
@@ -1654,7 +1659,7 @@ function engWordDblClick(e){
   var t=e.target;
   if(!(t&&t.closest&&t.closest('#main-content'))) return;
   if(t&&t.closest&&t.closest('button,.action-btn,.opt,.pos-velcro')) return;
-  engPopWord(e.clientX,e.clientY);
+  clearEngSelection(); engPopWord(e.clientX,e.clientY);
   engBubbleSource='click';
 }
 function engPopWord(x,y){
@@ -1763,12 +1768,15 @@ function bindEngTranslate(){
   document.addEventListener('dblclick',engWordDblClick);
   document.removeEventListener('mouseup',engSelUp);
   document.addEventListener('mouseup',engSelUp);
+  document.removeEventListener('mousedown',engDownMark);
+  document.addEventListener('mousedown',engDownMark);
   document.removeEventListener('mousemove',engHoverMove);
   document.addEventListener('mousemove',engHoverMove);
 }
 function cleanupEngTranslate(){
   document.removeEventListener('click',engOptWordGuard,true);
   document.removeEventListener('dblclick',engOptWordGuard,true);
+  document.removeEventListener('mousedown',engDownMark);
   engOptHoverClear();
   engBubbleWord=null;
   engHlClear();
