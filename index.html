@@ -1314,8 +1314,9 @@ function showWordBubble(x,y,entry){
   engBubbleWord=entry.w;
   var b=document.createElement('div');
   b.id='eng-word-bubble';
-  b.style.cssText='position:fixed;z-index:9999;max-width:340px;background:#fff;border:1px solid #e2d8c8;border-radius:10px;box-shadow:0 6px 22px rgba(0,0,0,.14);padding:12px 15px;font-size:13.5px;line-height:1.65;pointer-events:auto';
-  var html='<div style="font-weight:700;font-size:15.5px;color:#222">'+entry.w+'</div>';
+  b.style.cssText='position:fixed;z-index:9999;max-width:340px;background:#fff;border:1px solid #e2d8c8;border-radius:10px;box-shadow:0 6px 22px rgba(0,0,0,.14);padding:12px 30px 12px 15px;font-size:13.5px;line-height:1.65;pointer-events:auto';
+  var html='<div style="position:absolute;top:5px;right:6px;cursor:pointer;font-size:16px;color:#b0a898;line-height:1;padding:5px 8px;border-radius:6px;pointer-events:auto" onclick="closeWordBubble()" title="关闭">✕</div>';
+  html+='<div style="font-weight:700;font-size:15.5px;color:#222">'+entry.w+'</div>';
   if(entry.pho) html+='<div style="color:#8a8a8a;font-size:12.5px;margin-top:1px">'+String(entry.pho).replace(/\r/g,'')+'</div>';
   if(entry.pos) html+='<div style="color:#666;font-size:12px;margin-top:2px">'+String(entry.pos).replace(/\r/g,'')+'</div>';
   if(entry.def) html+='<div style="color:#b5482e;font-weight:600;margin-top:5px;white-space:pre-wrap">'+String(entry.def).replace(/\r/g,'')+'</div>';
@@ -1340,8 +1341,8 @@ function showMissBubble(x,y,w){
   engBubbleWord=w;
   var b=document.createElement('div');
   b.id='eng-word-bubble';
-  b.style.cssText='position:fixed;z-index:9999;max-width:260px;background:#fff;border:1px solid #e2d8c8;border-radius:10px;box-shadow:0 6px 22px rgba(0,0,0,.14);padding:10px 14px;font-size:13px;line-height:1.6;pointer-events:auto';
-  b.innerHTML='<div style="color:#888">「'+w+'」暂未收录于离线词库</div><div style="color:#bbb;font-size:11.5px;margin-top:4px">可选中句子使用段落翻译</div>';
+  b.style.cssText='position:fixed;z-index:9999;max-width:260px;background:#fff;border:1px solid #e2d8c8;border-radius:10px;box-shadow:0 6px 22px rgba(0,0,0,.14);padding:10px 28px 10px 14px;font-size:13px;line-height:1.6;pointer-events:auto';
+  b.innerHTML='<div style="position:absolute;top:4px;right:5px;cursor:pointer;font-size:15px;color:#b0a898;line-height:1;padding:5px 7px;border-radius:6px;pointer-events:auto" onclick="closeWordBubble()" title="关闭">✕</div><div style="color:#888">「'+w+'」暂未收录于离线词库</div><div style="color:#bbb;font-size:11.5px;margin-top:4px">可选中句子使用段落翻译</div>';
   document.body.appendChild(b);
   clearEngSelection();
   var r=b.getBoundingClientRect();
