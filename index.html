@@ -572,6 +572,11 @@ body.eng-exam-mode .q-text .qscore{color:var(--sub);font-size:13px;margin-right:
 </style>
 </head>
 <body>
+<div id="app-loading" style="position:fixed;inset:0;z-index:99999;background:#f7f8fa;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+  <div style="width:38px;height:38px;border:4px solid #e6e9e4;border-top-color:#b5482e;border-radius:50%;animation:ldspin .9s linear infinite"></div>
+  <div style="font-size:14px;color:#888">资料加载中，请稍候…</div>
+</div>
+<style>@keyframes ldspin{to{transform:rotate(360deg)}}</style>
 <div class="topbar">
   <div class="topbar-inner">
     <button class="m-nav-btn" id="mNavBtn" onclick="toggleMNav()" aria-label="打开导航">☰</button>
@@ -9651,6 +9656,9 @@ window.examSubmit=function(auto){
   window.addEventListener('scroll',upd,{passive:true});
   upd();
 })();
+</script>
+<script>
+try{ var __ld=document.getElementById('app-loading'); if(__ld&&__ld.parentNode) __ld.parentNode.removeChild(__ld); }catch(e){}
 </script>
 
 </body>
