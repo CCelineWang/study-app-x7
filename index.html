@@ -1390,7 +1390,7 @@ function showTimeline(code,period){
   html+='<div style="font-size:13px;color:#555;margin:10px 0 6px">'+(cur==='all'?'全部 '+shown.length+' 条':periodName[cur]+' · '+shown.length+' 条')+'</div>';
   html+='<div style="border-left:3px solid #d0d7e2;padding-left:16px">';
   shown.forEach(function(it){
-    const e=escHtml(it.e).split('\n').join('<br/>');
+    const e=escHtml(it.e).split('\n').join('<br/>').replace(/(\d+[）)]|[①②③④⑤⑥⑦⑧⑨⑩]|（[一二三四五六七八九十]+）|\([一二三四五六七八九十]+\)|→)/g,'<br/>$1').replace(/(<br\/>){2,}/g,'<br/>').replace(/^(<br\/>)+/,'');
     html+='<div style="margin-bottom:12px;position:relative">'
       +'<div style="position:absolute;left:-22px;top:6px;width:9px;height:9px;border-radius:50%;background:#b5482e"></div>'
       +'<div style="color:#b5482e;font-weight:700;font-size:15px">'+escHtml(it.y)+'</div>'
