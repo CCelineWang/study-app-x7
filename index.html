@@ -77,9 +77,12 @@ body{font-family:-apple-system,"Microsoft YaHei",sans-serif;background:var(--bg)
 .opt:disabled{cursor:default}
 
 /* 操作按钮 */
-.q-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.q-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center}
 .action-btn{padding:8px 16px;border-radius:8px;border:1px solid var(--line);background:#f7f4ec;font-size:13px;cursor:pointer;color:var(--ink)}
 .action-btn:hover{background:#efe9da}
+.fav-btn{border:0;background:transparent;cursor:pointer;font-size:22px;line-height:1;padding:4px 8px;color:#b9c0c9;transition:transform .12s;flex-shrink:0;border-radius:8px}
+.fav-btn:hover{transform:scale(1.18);background:rgba(245,179,1,.08)}
+.fav-btn[data-on="1"]{color:#f5b301}
 .wrong-btn{padding:8px 16px;border-radius:8px;border:1px solid #f0cfc6;background:var(--accentbg);font-size:13px;cursor:pointer;color:var(--accent)}
 .wrong-btn:hover{background:#f8ddd6}
 .wrong-btn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
@@ -518,7 +521,7 @@ body.eng-exam-mode .q-text .qscore{color:var(--sub);font-size:13px;margin-right:
   .topbar-inner{justify-content:flex-start;gap:10px;padding:0 10px}
   .m-nav-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;flex-shrink:0;border:0;background:rgba(0,0,0,.05);font-size:20px;color:var(--brand);cursor:pointer;border-radius:9px}
   .layout{display:block}
-  .sidebar{display:block;position:fixed;left:-340px;top:0;bottom:0;width:76vw;max-width:290px;z-index:60;height:100vh;border-right:0;border-radius:0;background:rgba(255,255,255,.96);box-shadow:2px 0 18px rgba(0,0,0,.18);transition:left .3s cubic-bezier(.25,.8,.3,1)}
+  .sidebar{display:block;position:fixed;left:-340px;top:0;bottom:0;width:max-content;min-width:0;max-width:78vw;z-index:60;height:100vh;border-right:0;border-radius:0;background:rgba(255,255,255,.96);box-shadow:2px 0 18px rgba(0,0,0,.18);transition:left .3s cubic-bezier(.25,.8,.3,1)}
   .sidebar.open{left:0}
   @supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
     .sidebar{background:rgba(255,255,255,.8);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
@@ -1099,6 +1102,7 @@ function buildSidebar(code){
     ehtml+='<div class="nav-section">'+s.name+'</div>';
     ehtml+='<div class="nav-item" data-mod="overview" onclick="showOverview(\''+code+'\')">📚 总览</div>';
     ehtml+='<div class="nav-item nav-sec" data-mod="sets" onclick="toggleNavSec(\'sets\');showSets(\''+code+'\')"><span class="nav-toggle">▶</span>📝 历年真题</div>'+sub('sets',yearSets);
+    ehtml+='<div class="nav-item" data-mod="fav" onclick="setActive(\'fav\');showFav(\''+code+'\')">⭐ 收藏夹</div>';
     var skillSrc={};
     ['阅读判断专项真题讲解（2017-2022）','阅读选择专项真题讲解（2017-2022）','概括段落大意和补全句子专项真题讲解（2017-2022）','填句补文专项真题讲解（2017-2022）','填词补文·完型补文做题技巧总结（内部讲义下）','填词补文历年真题精讲（2017-2022）','完型补文做题法则与历年真题精讲（2017-2022）','考前押题作文','作文背诵模板','作文最新版','高频词汇','词组表','常考动词与时态变化（曹胖指定必背动词表）','常考副词与易考词性转换（附件二+附录1）','做题方法与技巧','应试技巧（新题型）','自考英语二课后题答案（教材课后练习参考答案）'].forEach(function(k){ skillSrc[k]=1; });
     var sprintPractice=[];
@@ -1162,6 +1166,7 @@ function buildSidebar(code){
   html+='<div class="nav-item" data-mod="overview" onclick="showOverview(\''+code+'\')">📚 总览</div>';
   if(yearSets.length>0){
     html+='<div class="nav-item nav-sec" data-mod="sets" onclick="toggleNavSec(\'sets\');showSets(\''+code+'\')"><span class="nav-toggle">▶</span>📝 历年真题</div>'+sub('sets',yearSets);
+    html+='<div class="nav-item" data-mod="fav" onclick="setActive(\'fav\');showFav(\''+code+'\')">⭐ 收藏夹</div>';
   }
   if(code==='15043'){
     var zxTypes=['单项选择题','多项选择题','填空题','简答题','论述题'];
@@ -8637,6 +8642,70 @@ var mmaps=(code==='15043'&&k==='笔记汇总')?MINDMAP[String(gi+1)]:((code==='1
   });
 }
 
+/* ===== 真题收藏：⭐ 手动收藏键（localStorage 持久化，按科目独立收藏夹） ===== */
+var ZK_FAV_KEY='zk_fav';
+function favGet(code){ try{ var o=JSON.parse(localStorage.getItem(ZK_FAV_KEY)||'{}'); return (o[code]||[]).slice(); }catch(e){ return []; } }
+function favSave(code,arr){ try{ var o=JSON.parse(localStorage.getItem(ZK_FAV_KEY)||'{}'); o[code]=arr; localStorage.setItem(ZK_FAV_KEY,JSON.stringify(o)); }catch(e){} }
+function favHas(id){ var p=id.split('|'); return favGet(p[0]).indexOf(id)>=0; }
+function favToggle(id,btn){
+  var p=id.split('|'); var arr=favGet(p[0]);
+  var i=arr.indexOf(id); var on;
+  if(i>=0){ arr.splice(i,1); on=false; } else { arr.unshift(id); on=true; }
+  favSave(p[0],arr);
+  if(btn){ btn.innerHTML=on?'★':'☆'; btn.setAttribute('data-on',on?'1':'0'); btn.title=on?'取消收藏':'收藏本题'; }
+  return on;
+}
+function favBtnHTML(id){
+  var on=favHas(id);
+  return '<button class="fav-btn" data-on="'+(on?'1':'0')+'" title="'+(on?'取消收藏':'收藏本题')+'" onclick="favToggle(\''+id+'\',this)">'+(on?'★':'☆')+'</button>';
+}
+function showFav(code){
+  cleanupEngTranslate();
+  document.body.classList.remove('eng-exam-mode');
+  document.body.classList.remove('eng-word-mode');
+  var s=DATA[code]; if(!s) return;
+  var box=document.getElementById('main-content');
+  var arr=favGet(code);
+  document.getElementById('tb-title').textContent=s.name+' · 收藏夹';
+  document.getElementById('tb-crumb').textContent='首页 / '+s.name+' / 收藏夹';
+  if(!arr.length){
+    box.innerHTML='<span class="back2" onclick="backToSubject()">← 返回</span>'
+      +'<div style="font-size:17px;font-weight:700;margin:10px 0 6px">⭐ 收藏夹</div>'
+      +'<div style="padding:46px 20px;text-align:center;color:#999;font-size:14px;line-height:2">还没有收藏题目<br>在历年真题中，点击题目右下角的 <span style="font-size:20px;color:#b9c0c9">☆</span> 即可收藏本题</div>';
+    return;
+  }
+  var html='<span class="back2" onclick="backToSubject()">← 返回</span>'
+    +'<div style="font-size:17px;font-weight:700;margin:10px 0 2px">⭐ 收藏夹</div>'
+    +'<div style="font-size:13px;color:#999;margin-bottom:10px">共 <b id="favCount">'+arr.length+'</b> 题 · 点击 ★ 可取消收藏</div>';
+  box.innerHTML=html;
+  var typeLabels={'choice':'单选题','multi':'多选题','short':'简答题','essay':'作文'};
+  arr.forEach(function(id){
+    var p=id.split('|'); var set=p[1], type=p[2], idx=parseInt(p[3],10);
+    var found=findItem(id);
+    if(!found||!found.item) return;
+    var item=found.item;
+    var typeLabel=typeLabels[type]||(type.charAt(0)==='S'?(function(){ try{ return DATA[code].sets[set].sections[parseInt(type.slice(1),10)].head; }catch(e){ return ''; } })():type);
+    var card=document.createElement('div');
+    card.className='q-card';
+    card.setAttribute('data-qno',idx+1);
+    card.innerHTML='<div class="q-head"><span class="qn">'+(idx+1)+'.</span><span class="qscore" style="color:#888;font-size:12px">'+typeLabel+'</span></div>'
+      +'<div class="q-text">'+item.q+'</div>'
+      +'<div class="q-actions"><button class="action-btn" onclick="toggleAns(this)">显示答案</button>'
+      +'<button class="fav-btn" data-on="1" title="取消收藏" onclick="favRemoveInFav(\''+id+'\',this)">★</button></div>'
+      +'<div class="ans-box" style="display:none"><div class="ans-row"><span class="av" style="white-space:pre-wrap">'+colorPoints(String(item.a||''))+'</span></div></div>';
+    box.appendChild(card);
+  });
+}
+function favRemoveInFav(id,btn){
+  var p=id.split('|');
+  var arr=favGet(p[0]);
+  var i=arr.indexOf(id);
+  if(i>=0){ arr.splice(i,1); favSave(p[0],arr); }
+  var card=btn; while(card&&String(card.className||'').indexOf('q-card')<0) card=card.parentNode;
+  if(card) card.remove();
+  var fc=document.getElementById('favCount');
+  if(fc){ fc.textContent=parseInt(fc.textContent,10)-1; if(fc.textContent==='0'){ var box=document.getElementById('main-content'); box.innerHTML='<span class="back2" onclick="backToSubject()">← 返回</span>'+'<div style="font-size:17px;font-weight:700;margin:10px 0 6px">⭐ 收藏夹</div>'+'<div style="padding:46px 20px;text-align:center;color:#999;font-size:14px;line-height:2">还没有收藏题目<br>在历年真题中，点击题目右下角的 <span style="font-size:20px;color:#b9c0c9">☆</span> 即可收藏本题</div>'; } }
+}
 function startQuiz(code,setName){
   // 专用渲染：高频选择题105题（分组刷+进度+错题联动）、考前预测54题（题型分组+自测进度）
   if(code==='15043'&&setName==='高频选择题105题'){ showHi105(); return; }
@@ -8880,7 +8949,7 @@ function renderQuizToMain(exam, onlyType, backExpr){
       const scoreTxt='（'+sec.score+'分）';
       if(type==='choice'){
         choiceQues.push({id:id,qnoNum:qno,card:card,item:item});
-        card.innerHTML='<div class="q-head"><span class="qn">'+qno+'.</span><span class="qscore">'+scoreTxt+'</span></div><div class="q-text" data-ze="'+curSubj+'|set|'+curSet+'|'+zloc+'|q|" data-cur="'+escAttr(item.q)+'">'+item.q+'</div><div class="opts"></div><div class="q-actions"><button class="action-btn" onclick="revealChoice(this,\''+id+'\')">显示答案</button></div><div class="ans-box"></div>';
+        card.innerHTML='<div class="q-head"><span class="qn">'+qno+'.</span><span class="qscore">'+scoreTxt+'</span></div><div class="q-text" data-ze="'+curSubj+'|set|'+curSet+'|'+zloc+'|q|" data-cur="'+escAttr(item.q)+'">'+item.q+'</div><div class="opts"></div><div class="q-actions"><button class="action-btn" onclick="revealChoice(this,\''+id+'\')">显示答案</button>'+favBtnHTML(id)+'</div><div class="ans-box"></div>';
         const ow=card.querySelector('.opts');
         item.opts.forEach((op,i)=>{
           const b=document.createElement('button');
@@ -8911,7 +8980,7 @@ function renderQuizToMain(exam, onlyType, backExpr){
         }
       } else if(type==='multi'){
         const oh=item.opts.map((op,i)=>'<button class="opt" data-ze="'+curSubj+'|set|'+curSet+'|'+zloc+'|opts|'+i+'" data-cur="'+escAttr(op)+'" onclick="multiToggle(this,\''+id+'\')"><span class="opt-letter">'+'ABCD'[i]+'</span><span>'+op+'</span></button>').join('');
-        card.innerHTML='<div class="q-head"><span class="qn">'+qno+'.</span><span class="qscore">'+scoreTxt+'</span></div><div class="q-text" data-ze="'+curSubj+'|set|'+curSet+'|'+zloc+'|q|" data-cur="'+escAttr(item.q)+'">'+item.q+'</div><div class="opts">'+oh+'</div><div class="q-actions"><button class="action-btn" onclick="judgeMulti(this,\''+id+'\')">显示答案</button></div><div class="ans-box"></div>';
+        card.innerHTML='<div class="q-head"><span class="qn">'+qno+'.</span><span class="qscore">'+scoreTxt+'</span></div><div class="q-text" data-ze="'+curSubj+'|set|'+curSet+'|'+zloc+'|q|" data-cur="'+escAttr(item.q)+'">'+item.q+'</div><div class="opts">'+oh+'</div><div class="q-actions"><button class="action-btn" onclick="judgeMulti(this,\''+id+'\')">显示答案</button>'+favBtnHTML(id)+'</div><div class="ans-box"></div>';
         if(answers[id]!==undefined){
           var __picked=String(answers[id]).split('');
           card.querySelectorAll('.opt').forEach((ob,oi)=>{
@@ -8922,7 +8991,7 @@ function renderQuizToMain(exam, onlyType, backExpr){
           });
         }
       } else {
-        card.innerHTML='<div class="q-head"><span class="qn">'+qno+'.</span><span class="qscore">'+scoreTxt+'</span></div><div class="q-text" data-ze="'+curSubj+'|set|'+curSet+'|'+zloc+'|q|" data-cur="'+escAttr(item.q)+'">'+item.q+'</div><div class="q-actions"><button class="action-btn" onclick="toggleAns(this,\''+id+'\')">显示答案</button></div><div class="ans-box" style="display:none"></div>';
+        card.innerHTML='<div class="q-head"><span class="qn">'+qno+'.</span><span class="qscore">'+scoreTxt+'</span></div><div class="q-text" data-ze="'+curSubj+'|set|'+curSet+'|'+zloc+'|q|" data-cur="'+escAttr(item.q)+'">'+item.q+'</div><div class="q-actions"><button class="action-btn" onclick="toggleAns(this,\''+id+'\')">显示答案</button>'+favBtnHTML(id)+'</div><div class="ans-box" style="display:none"></div>';
         const ab=card.querySelector('.ans-box');
         const ansTxt=(/^\d{4}/.test(curSet||''))?colorPoints(splitPointsZh(item.a||'')):colorPoints(item.a||'');
         ab.innerHTML='<div class="ans-row"><span class="av" style="white-space:pre-wrap" data-ze="'+curSubj+'|set|'+curSet+'|'+zloc+'|a|" data-cur="'+escAttr(item.a)+'">'+ansTxt+'</span></div>';
@@ -8981,8 +9050,8 @@ function renderSections(sections,box){
       card.setAttribute('data-qno',qno);
       if(type==='choice'){
         choiceQues.push({id:id,qnoNum:qno,card:card,item:item,sec:sec});
-        // 英语真题选择题：去掉"显示答案"按钮（选对变绿/选错变红即反馈）
-        const actBtn=isEng?'':'<div class="q-actions"><button class="action-btn" onclick="revealChoice(this,\''+id+'\')">显示答案</button></div>';
+        // 英语真题选择题：去掉"显示答案"按钮（选对变绿/选错变红即反馈），⭐ 收藏保留
+        const actBtn='<div class="q-actions">'+(isEng?'':'<button class="action-btn" onclick="revealChoice(this,\''+id+'\')">显示答案</button>')+favBtnHTML(id)+'</div>';
         card.innerHTML='<div class="q-text"><span class="qn">'+qno+'.</span><span class="qscore">'+scoreTxt+'</span>'+fmtTxt(item.q)+'</div><div class="opts"></div>'+actBtn+'<div class="ans-box"></div>';
         const ow=card.querySelector('.opts');
         item.opts.forEach(function(op,i){
@@ -9006,14 +9075,14 @@ function renderSections(sections,box){
         card.innerHTML='<div class="q-text" style="display:flex;align-items:baseline"><span class="qn">'+qno+'.</span><span class="qscore">'+scoreTxt+'</span></div>'
           +'<div style="margin:8px 0"><textarea id="essay-in-'+qno+'" placeholder="请在此输入你的作文（100词左右）…" style="width:100%;min-height:140px;box-sizing:border-box;border:1px dashed #c9bfae;border-radius:8px;padding:10px;font-size:14px;line-height:1.7;outline:none;resize:vertical;background:#fffdf8" oninput="essayCount('+qno+')"></textarea>'
           +'<div style="text-align:right;margin-top:4px;font-size:12px;color:#999">已写 <b id="essay-cn-'+qno+'">0</b> 词</div></div>'
-          +'<div class="q-actions"><button class="action-btn" onclick="toggleEssay(this,\''+id+'\')">显示范文</button></div>'
+          +'<div class="q-actions"><button class="action-btn" onclick="toggleEssay(this,\''+id+'\')">显示范文</button>'+favBtnHTML(id)+'</div>'
           +'<div class="ans-box" style="display:none"></div>';
         const ab=card.querySelector('.ans-box');
         ab.innerHTML='<div class="ans-row" style="position:relative"><button class="sec-trans-btn" style="position:absolute;top:-6px;right:0;z-index:2" onclick="translateEssay(this)">全文翻译</button><span class="av" style="white-space:pre-wrap">'+colorPoints(item.a||'')+'</span></div>';
       } else {
         var qBody=fmtTxt(item.q);
         if(isEng&&type==='short'){ qBody=examClozeRender(item.q,String(qno),id,item.a); }
-        card.innerHTML='<div class="q-text"><span class="qn">'+qno+'.</span><span class="qscore">'+scoreTxt+'</span>'+qBody+'</div><div class="q-actions"><button class="action-btn" onclick="toggleAns(this,\''+id+'\')">显示答案</button></div><div class="ans-box" style="display:none"></div>';
+        card.innerHTML='<div class="q-text"><span class="qn">'+qno+'.</span><span class="qscore">'+scoreTxt+'</span>'+qBody+'</div><div class="q-actions"><button class="action-btn" onclick="toggleAns(this,\''+id+'\')">显示答案</button>'+favBtnHTML(id)+'</div><div class="ans-box" style="display:none"></div>';
         const ab=card.querySelector('.ans-box');
         ab.innerHTML='<div class="ans-row"><span class="av" style="white-space:pre-wrap">'+colorPoints(item.a||'')+'</span></div>';
       }
