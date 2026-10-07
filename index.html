@@ -5,9 +5,7 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>自考专升本刷题 · 史纲/马原</title>
-<link rel="icon" type="image/png" href="favicon-512.png">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="shortcut icon" href="favicon.ico">
+<link rel="icon" type="image/png" href="icon-512.png">
 <link rel="apple-touch-icon" href="apple-touch-icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">
 <style>
@@ -577,6 +575,7 @@ body.eng-exam-mode .q-text .qscore{color:var(--sub);font-size:13px;margin-right:
 </style>
 </head>
 <body>
+<script src="access.js"></script>
 <div id="app-loading" style="position:fixed;inset:0;z-index:99999;background:#f7f8fa;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
   <div style="width:38px;height:38px;border:4px solid #e6e9e4;border-top-color:#b5482e;border-radius:50%;animation:ldspin .9s linear infinite"></div>
   <div style="font-size:14px;color:#888">资料加载中，请稍候…</div>
@@ -10954,6 +10953,41 @@ function resumeJumpVocab(code,mode,n){
 </script>
 <script>
 try{ var __ld=document.getElementById('app-loading'); if(__ld&&__ld.parentNode) __ld.parentNode.removeChild(__ld); }catch(e){}
+/* ===== 访问密码锁：买家激活码 / 管理密码，解锁后本机记住 ===== */
+(function(){
+  var acc=window.ZK_ACCESS||{};
+  if(acc.enabled===false) return;
+  if(localStorage.getItem('zk_ok')==='1') return;
+  var cfgOk=(acc.codes&&acc.codes.length>0)||(acc.master&&acc.master!=='');
+  var hint=cfgOk?'请输入激活码解锁使用':'系统配置异常，请联系管理员';
+  var d=document.createElement('div');
+  d.id='zk-lock';
+  d.style.cssText='position:fixed;inset:0;z-index:100000;background:linear-gradient(160deg,#f7f8fa 0%,#eef1f5 100%);display:flex;align-items:center;justify-content:center;padding:16px';
+  d.innerHTML=
+    '<div style="background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.12);padding:34px 30px 28px;width:100%;max-width:360px;text-align:center;box-sizing:border-box">'+
+    '<div style="font-size:22px;font-weight:800;color:#2b3a55;letter-spacing:1px">📚 自考刷题平台</div>'+
+    '<div style="font-size:13px;color:#999;margin:8px 0 22px">'+hint+'</div>'+
+    '<input id="zk-pass" type="password" placeholder="激活码 / 管理密码" style="width:100%;padding:12px 14px;border:1px solid #dde2e8;border-radius:10px;font-size:15px;outline:none;box-sizing:border-box;text-align:center" />'+
+    '<div id="zk-err" style="color:#c0392b;font-size:13px;min-height:18px;margin:8px 0 2px"></div>'+
+    '<button onclick="ZK_unlock()" style="width:100%;padding:12px;background:#b5482e;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;margin-top:6px">解锁</button>'+
+    '<div style="font-size:11px;color:#bbb;margin-top:16px">解锁后本机自动记住，换设备需重新输入</div>'+
+    '</div>';
+  document.body.appendChild(d);
+  window.ZK_unlock=function(){
+    var p=(document.getElementById('zk-pass').value||'').trim();
+    var a=window.ZK_ACCESS||{};
+    var ok=(p===a.master)||((a.codes||[]).indexOf(p)>=0);
+    if(ok){
+      try{ localStorage.setItem('zk_ok','1'); }catch(e){}
+      var m=document.getElementById('zk-lock'); if(m&&m.parentNode) m.parentNode.removeChild(m);
+      return;
+    }
+    var er=document.getElementById('zk-err');
+    if(er) er.textContent=(cfgOk?'激活码不正确，请核对后重试':'系统配置异常，请稍后再试');
+  };
+  var inp=document.getElementById('zk-pass');
+  if(inp) inp.addEventListener('keydown',function(ev){ if(ev.key==='Enter'){ try{ window.ZK_unlock(); }catch(e){} } });
+})();
 </script>
 
 </body>
