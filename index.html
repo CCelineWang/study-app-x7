@@ -1574,7 +1574,8 @@ function showTimeline(code,period){
 
 function showPrediction(code){
   setActive('prediction');
-  if(showModOverview(code,'prediction',code==='13000'?'考前冲刺':'考前预测/押题','🎯')) return;
+  var __predMod=(code==='13000')?'sprint':'prediction';
+  if(showModOverview(code,__predMod,code==='13000'?'考前冲刺':'考前预测/押题','🎯')) return;
   const s=DATA[code];
   document.getElementById('tb-crumb').textContent='首页 / '+s.name+' / 考前预测/押题';
   var allSets = Object.keys(s.sets||{});
@@ -4515,6 +4516,7 @@ function showSkillReadingHome(code){
   else { document.body.classList.remove('eng-word-mode'); document.body.classList.remove('eng-exam-mode'); }
   var s=DATA[code];
   setActive('skillreading');
+  if(showModOverview(code,'skillreading','专项训练','🎯')) return;
   document.getElementById('tb-crumb').textContent='首页 / '+s.name+' / 专项训练';
   document.getElementById('tb-title').textContent=s.name+' · 专项训练 · 七大题型真题分组练习';
   var names=['阅读判断','阅读选择','概括段落大意和补全句子','填句补文','填词补文','完形补文','短文写作'];
