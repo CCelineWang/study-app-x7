@@ -1502,6 +1502,31 @@ function showOverview(code){
   document.getElementById('main-content').innerHTML=html;
 }
 
+/* ===== 板块总览：点击侧栏大板块 → 网格小方块（子板块入口），区别于一列排开的列表页 ===== */
+function showModOverview(code,mod,title,icon){
+  var sub=document.getElementById('navsub-'+mod);
+  if(!sub) return false;
+  var items=sub.querySelectorAll('.nav-sub-item');
+  if(!items||!items.length) return false;
+  setActive(mod);
+  var s=DATA[code];
+  document.getElementById('tb-crumb').textContent='首页 / '+s.name+' / '+title;
+  document.getElementById('tb-title').textContent=s.name+' · '+title;
+  var html='<span class="back2" onclick="backToSubject()">← 返回</span>';
+  html+='<div style="font-size:17px;font-weight:700;margin:4px 0 2px">'+icon+' '+title+'</div>';
+  html+='<div style="font-size:13px;color:#999;margin-bottom:6px">点击板块进入</div>';
+  html+='<div class="mod-grid">';
+  Array.prototype.forEach.call(items,function(it){
+    var label=escHtml(it.textContent);
+    var k=it.getAttribute('data-k');
+    var m=it.getAttribute('data-mod');
+    html+='<div class="mod" style="padding:24px 14px" onclick="navGo(\''+code+'\',\''+m+'\',\''+String(k||'').replace(/'/g,"\\'")+'\')"><div class="name" style="font-size:14px;word-break:break-all">'+label+'</div><div class="cnt" style="color:#b5482e;font-weight:600;margin-top:8px">进入 →</div></div>';
+  });
+  html+='</div>';
+  document.getElementById('main-content').innerHTML=html;
+  return true;
+}
+
 function tlPeriod(y){
   var m=String(y).match(/(\d{4})/);
   if(!m){ if(String(y).indexOf('19世纪')>=0) return '旧'; return 'all'; }
@@ -1549,6 +1574,7 @@ function showTimeline(code,period){
 
 function showPrediction(code){
   setActive('prediction');
+  if(showModOverview(code,'prediction',code==='13000'?'考前冲刺':'考前预测/押题','🎯')) return;
   const s=DATA[code];
   document.getElementById('tb-crumb').textContent='首页 / '+s.name+' / 考前预测/押题';
   var allSets = Object.keys(s.sets||{});
@@ -1603,6 +1629,7 @@ function showPrediction(code){
 
 function showPractice(code){
   setActive('practice');
+  if(showModOverview(code,'practice','练习/刷题','✏️')) return;
   const s=DATA[code];
   document.getElementById('tb-crumb').textContent='首页 / '+s.name+' / 练习/刷题';
   var allSets = Object.keys(s.sets||{});
@@ -3041,6 +3068,7 @@ function zxGroupCount(code,type,gr){
 }
 function showZxHome(code){
   setActive('zx'); setSubActive('zx','');
+  if(showModOverview(code,'zx','专项训练','🎯')) return;
   const s=DATA[code];
   document.getElementById('tb-crumb').textContent='首页 / '+s.name+' / 专项训练';
   document.getElementById('tb-title').textContent=s.name+' · 专项训练';
@@ -4170,6 +4198,7 @@ function grmTableHtml(head, rows){
 
 function showQA(code){
   setActive('qa');
+  if(showModOverview(code,'qa','主观题背诵','📖')) return;
   const s=DATA[code];
   document.getElementById('tb-crumb').textContent='首页 / '+s.name+' / 背诵笔记';
   let html='<div style="font-size:17px;font-weight:700;margin-bottom:4px">背诵/笔记</div>';
@@ -4301,6 +4330,7 @@ window.miyaMark=function(gi,miyaGi,idx){
 
 function showBlanks(code){
   setActive('blanks');
+  if(showModOverview(code,'blanks','挖空背诵','🔍')) return;
   const s=DATA[code];
   document.getElementById('tb-crumb').textContent='首页 / '+s.name+' / 挖空背诵';
   document.getElementById('tb-title').textContent=s.name+' · 挖空背诵';
