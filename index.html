@@ -1104,6 +1104,7 @@ function buildSidebar(code){
     var ehtml='<div class="nav-item" onclick="showHome()">← 返回首页</div>';
     ehtml+='<div class="nav-section">'+s.name+'</div>';
     ehtml+='<div class="nav-item" data-mod="overview" onclick="showOverview(\''+code+'\')">📚 总览</div>';
+    ehtml+='<div class="nav-item" data-mod="pred" onclick="setActive(\'pred\');showPred(\''+code+'\')">🔮 真题预测</div>';
     ehtml+='<div class="nav-item nav-sec" data-mod="sets" onclick="toggleNavSec(\'sets\');showSets(\''+code+'\')"><span class="nav-toggle">▶</span>📝 历年真题</div>'+sub('sets',yearSets);
     var skillSrc={};
     ['阅读判断专项真题讲解（2017-2022）','阅读选择专项真题讲解（2017-2022）','概括段落大意和补全句子专项真题讲解（2017-2022）','填句补文专项真题讲解（2017-2022）','填词补文·完型补文做题技巧总结（内部讲义下）','填词补文历年真题精讲（2017-2022）','完型补文做题法则与历年真题精讲（2017-2022）','考前押题作文','作文背诵模板','作文最新版','高频词汇','词组表','常考动词与时态变化（曹胖指定必背动词表）','常考副词与易考词性转换（附件二+附录1）','做题方法与技巧','应试技巧（新题型）','自考英语二课后题答案（教材课后练习参考答案）'].forEach(function(k){ skillSrc[k]=1; });
@@ -1145,7 +1146,6 @@ function buildSidebar(code){
     if(sprintGroups.length){
       ehtml+='<div class="nav-item nav-sec" data-mod="sprint" data-mods="prediction practice" onclick="toggleNavSec(\'sprint\');showPrediction(\''+code+'\')"><span class="nav-toggle">▶</span>🎯 考前冲刺</div>'+group('sprint',sprintGroups);
     }
-    ehtml+='<div class="nav-item" data-mod="pred" onclick="setActive(\'pred\');showPred(\''+code+'\')">🔮 真题预测</div>';
     /* —— 背诵/资料区 —— */
     if(s.essay&&(s.essay.overview||s.essay.essays)){
       ehtml+='<div class="nav-item nav-sec" data-mod="writing" data-mods="essayzone essaymat" onclick="toggleNavSec(\'writing\');showEssayHome(\''+code+'\')"><span class="nav-toggle">▶</span>✍️ 写作</div>'
@@ -1166,6 +1166,9 @@ function buildSidebar(code){
   let html='<div class="nav-item" onclick="showHome()">← 返回首页</div>';
   html+='<div class="nav-section">'+s.name+'</div>';
   html+='<div class="nav-item" data-mod="overview" onclick="showOverview(\''+code+'\')">📚 总览</div>';
+  if(yearSets.length>0){
+    html+='<div class="nav-item" data-mod="pred" onclick="setActive(\'pred\');showPred(\''+code+'\')">🔮 真题预测</div>';
+  }
   if(yearSets.length>0){
     html+='<div class="nav-item nav-sec" data-mod="sets" onclick="toggleNavSec(\'sets\');showSets(\''+code+'\')"><span class="nav-toggle">▶</span>📝 历年真题</div>'+sub('sets',yearSets);
   }
@@ -1205,9 +1208,6 @@ function buildSidebar(code){
   if(predSets.length+predQA.length+predRaw.length>0){
     html+='<div class="nav-item nav-sec" data-mod="prediction" onclick="toggleNavSec(\'prediction\');showPrediction(\''+code+'\')"><span class="nav-toggle">▶</span>🎯 考前预测/押题</div>'
       +group('prediction',[{icon:'📋',label:'试卷',items:predSets},{icon:'📝',label:'简答题',items:predQAShort},{icon:'📝',label:'论述题',items:predQAEssay},{icon:'📖',label:'带背/汇总',items:predQABeidai},{icon:'📄',label:'文本',items:predRaw},{icon:'📂',label:'其他',items:predQAOther}]);
-  }
-  if(yearSets.length>0){
-    html+='<div class="nav-item" data-mod="pred" onclick="setActive(\'pred\');showPred(\''+code+'\')">🔮 真题预测</div>';
   }
   if(practiceSets.length+practiceQA.length+practiceRaw.length+coreBlanks.length>0){
     var skillSrc={};
