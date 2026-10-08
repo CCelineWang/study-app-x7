@@ -593,6 +593,7 @@ body.eng-exam-mode .q-text .qscore{color:var(--sub);font-size:13px;margin-right:
     </div>
     <div class="topbar-actions">
       <button class="mini-btn" onclick="goWrongBook()">错题本 <b id="wrong-count">0</b></button>
+      <button class="mini-btn" onclick="goFavBook()">⭐ 收藏夹 <b id="fav-count">0</b></button>
       <button class="mini-btn" onclick="showStudyStats()">📊 进度 <b id="review-count" style="display:none;color:#c0392b">0</b></button>
       <button class="mini-btn" id="zeditBtn" onclick="toggleEditMode()">✏️ 编辑</button>
       <button class="mini-btn" id="zexpBtn" onclick="exportPatch()" style="display:none">📤 导出修改</button>
@@ -871,6 +872,7 @@ function showHome(){
   document.getElementById('tb-title').textContent='自考刷题平台';
   document.getElementById('tb-crumb').textContent='首页';
   curSubj=null;
+  updateFavCount();
 }
 
 function goSubject(code){
@@ -889,6 +891,7 @@ function goSubject(code){
   document.getElementById('view-subject').classList.remove('hidden');
   document.getElementById('tb-title').textContent=s.name;
   document.getElementById('tb-crumb').textContent='首页 / '+s.name;
+  updateFavCount();
   buildSidebar(code);
   showOverview(code);
 }
@@ -1102,7 +1105,6 @@ function buildSidebar(code){
     ehtml+='<div class="nav-section">'+s.name+'</div>';
     ehtml+='<div class="nav-item" data-mod="overview" onclick="showOverview(\''+code+'\')">📚 总览</div>';
     ehtml+='<div class="nav-item nav-sec" data-mod="sets" onclick="toggleNavSec(\'sets\');showSets(\''+code+'\')"><span class="nav-toggle">▶</span>📝 历年真题</div>'+sub('sets',yearSets);
-    ehtml+='<div class="nav-item" data-mod="fav" onclick="setActive(\'fav\');showFav(\''+code+'\')">⭐ 收藏夹</div>';
     var skillSrc={};
     ['阅读判断专项真题讲解（2017-2022）','阅读选择专项真题讲解（2017-2022）','概括段落大意和补全句子专项真题讲解（2017-2022）','填句补文专项真题讲解（2017-2022）','填词补文·完型补文做题技巧总结（内部讲义下）','填词补文历年真题精讲（2017-2022）','完型补文做题法则与历年真题精讲（2017-2022）','考前押题作文','作文背诵模板','作文最新版','高频词汇','词组表','常考动词与时态变化（曹胖指定必背动词表）','常考副词与易考词性转换（附件二+附录1）','做题方法与技巧','应试技巧（新题型）','自考英语二课后题答案（教材课后练习参考答案）'].forEach(function(k){ skillSrc[k]=1; });
     var sprintPractice=[];
@@ -1166,7 +1168,6 @@ function buildSidebar(code){
   html+='<div class="nav-item" data-mod="overview" onclick="showOverview(\''+code+'\')">📚 总览</div>';
   if(yearSets.length>0){
     html+='<div class="nav-item nav-sec" data-mod="sets" onclick="toggleNavSec(\'sets\');showSets(\''+code+'\')"><span class="nav-toggle">▶</span>📝 历年真题</div>'+sub('sets',yearSets);
-    html+='<div class="nav-item" data-mod="fav" onclick="setActive(\'fav\');showFav(\''+code+'\')">⭐ 收藏夹</div>';
   }
   if(code==='15043'){
     var zxTypes=['单项选择题','多项选择题','填空题','简答题','论述题'];
@@ -8653,7 +8654,20 @@ function favToggle(id,btn){
   if(i>=0){ arr.splice(i,1); on=false; } else { arr.unshift(id); on=true; }
   favSave(p[0],arr);
   if(btn){ btn.innerHTML=on?'★':'☆'; btn.setAttribute('data-on',on?'1':'0'); btn.title=on?'取消收藏':'收藏本题'; }
+  updateFavCount();
   return on;
+}
+function goFavBook(){
+  if(curSubj && DATA[curSubj]){ showFav(curSubj); }
+  else { alert('请先进入某个科目，再查看该科目的收藏夹'); }
+}
+function updateFavCount(){
+  var el=document.getElementById('fav-count');
+  if(!el) return;
+  var n=0;
+  if(curSubj && DATA[curSubj]){ n=favGet(curSubj).length; }
+  else { try{ var o=JSON.parse(localStorage.getItem(ZK_FAV_KEY)||'{}'); for(var k in o){ n+=(o[k]||[]).length; } }catch(e){} }
+  el.textContent=n;
 }
 function favBtnHTML(id){
   var on=favHas(id);
@@ -8701,6 +8715,7 @@ function favRemoveInFav(id,btn){
   var arr=favGet(p[0]);
   var i=arr.indexOf(id);
   if(i>=0){ arr.splice(i,1); favSave(p[0],arr); }
+  updateFavCount();
   var card=btn; while(card&&String(card.className||'').indexOf('q-card')<0) card=card.parentNode;
   if(card) card.remove();
   var fc=document.getElementById('favCount');
