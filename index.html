@@ -1144,6 +1144,7 @@ function toggleNavSub3(el){
   }
 }
 function navChapters(code,mod,k){
+  if(mod==='zx') return navZxThird(code,k);
   if(mod!=='blanks') return null;
   if(!(typeof DATA!=='undefined'&&DATA[code])) return null;
   var ok=(code==='15043'&&(k==='考点磨练'||k==='考前60分'||k==='考前30天'||k==='2510提分宝典'||k==='笔记汇总'||k==='考前10页纸'||k==='密押'))||
@@ -1155,6 +1156,24 @@ function navChapters(code,mod,k){
   var topRe=code==='15044'?/^(绪?论|导论|第[一二三四五六七八九十]+章|[一二三四五六七八九十]、)/:(code==='15040'?/^(习近平新时代中国特色社会主义思想|导论|第[一二三四五六七八九十]+章)/:/^(第[一二三四五六七八九十]+部分|第[一二三四五六七八九十]+章)/);
   var out=[]; v.forEach(function(it){ if(it&&it.header&&topRe.test(it.header)) out.push(it.header); });
   return out.length?out:null;
+}
+function navZxThird(code,k){
+  try{
+    var qs=function(s){ return String(s).replace(/'/g,''); };
+    var secs=zxSections(k,code);
+    var grs=zxSrcFor(code,k);
+    var out=[];
+    for(var si=0;si<secs.length;si++){
+      var keys=secs[si][1]||[];
+      for(var ki=0;ki<keys.length;ki++){
+        var gr=null;
+        for(var j=0;j<grs.length;j++){ if(grs[j].key===keys[ki]){ gr=grs[j]; break; } }
+        if(!gr) continue;
+        out.push({label:zxGrpLabel(k,gr), go:"document.getElementById('tb-crumb').textContent='首页 / '+DATA['"+code+"'].name+' / 专项训练 / "+qs(k)+"';setSubActive('zx','"+qs(k)+"');zxGo('"+code+"','"+qs(k)+"','"+qs(gr.key)+"','"+qs(gr.kind)+"')"});
+      }
+    }
+    return out.length?out:null;
+  }catch(e){ return null; }
 }
 function setSubActive(mod,k){
   document.querySelectorAll('.nav-sub-item').forEach(function(n){ n.classList.remove('active'); });
@@ -1323,8 +1342,14 @@ function buildSidebar(code){
       h+='<div class="nav-sub-item '+cls+'" data-mod="'+mod+'" data-k="'+esc(k)+'" onclick="'+(chs?go+';toggleNavSub3(this)':go)+'">'+lab+'</div>';
       if(chs){
         h+='<div class="nav-sub3">';
-        for(var c=0;c<chs.length;c++){
-          h+='<div class="nav-sub3-item" onclick="'+go+';setTimeout(function(){try{window.ktGo('+c+')}catch(e){}},60)">'+escHtml(chs[c])+'</div>';
+        if(mod==='zx'){
+          for(var c=0;c<chs.length;c++){
+            h+='<div class="nav-sub3-item" onclick="'+chs[c].go+'">'+escHtml(chs[c].label)+'</div>';
+          }
+        } else {
+          for(var c=0;c<chs.length;c++){
+            h+='<div class="nav-sub3-item" onclick="'+go+';setTimeout(function(){try{window.ktGo('+c+')}catch(e){}},60)">'+escHtml(chs[c])+'</div>';
+          }
         }
         h+='</div>';
       }
