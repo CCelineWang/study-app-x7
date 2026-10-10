@@ -16,7 +16,7 @@
   --ok:#2d6a4f; --okbg:#e8f3ec; --bad:#9d2b2b; --badbg:#fbeaea;
   --hi:#fdf6e3; --leftbar:#b5482e;
 }
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{scroll-padding-top:96px}
 :focus-visible{outline:2px solid #b5482e;outline-offset:2px}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
@@ -519,6 +519,12 @@ body.eng-exam-mode .q-text .qscore{color:var(--sub);font-size:13px;margin-right:
 .nav-group-sub{display:none;padding:0 0 4px}
 .nav-group.open + .nav-group-sub{display:block}
 .nav-group-sub .nav-sub-item{padding-left:40px}
+/* 三级章节导航（手风琴） */
+.nav-sub3{display:none;padding:0 0 6px}
+.nav-sub3.open{display:block}
+.nav-sub3-item{display:block;padding:5px 12px 5px 46px;font-size:12px;color:#999;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-left:3px solid transparent;transition:.12s}
+.nav-sub3-item:hover{background:rgba(0,0,0,.03);color:#333}
+.nav-sub3-item.active{border-left-color:#8cb;color:#2a6}
 
 /* ===== 移动端自适应（手机/窄屏） ===== */
 .m-nav-btn{display:none}
@@ -1124,6 +1130,32 @@ function toggleNavSec(mod){
     }
   });
 }
+function toggleNavSub3(el){
+  var sub=el.nextElementSibling;
+  if(!sub||!sub.classList||!sub.classList.contains('nav-sub3')) return;
+  var open=sub.classList.toggle('open');
+  if(open){
+    var mod=el.getAttribute('data-mod');
+    document.querySelectorAll('.nav-sub-item[data-mod="'+mod+'"]').forEach(function(n){
+      if(n===el) return;
+      var s=n.nextElementSibling;
+      if(s&&s.classList&&s.classList.contains('nav-sub3')) s.classList.remove('open');
+    });
+  }
+}
+function navChapters(code,mod,k){
+  if(mod!=='blanks') return null;
+  if(!(typeof DATA!=='undefined'&&DATA[code])) return null;
+  var ok=(code==='15043'&&(k==='考点磨练'||k==='考前60分'||k==='考前30天'||k==='2510提分宝典'||k==='笔记汇总'||k==='考前10页纸'||k==='密押'))||
+         (code==='15044'&&(k==='考前60分'||k==='考前30天'||k==='考前10页纸'||k==='密押'))||
+         (code==='15040'&&k==='思维导图')||(code==='15044'&&k==='思维导图');
+  if(!ok) return null;
+  var v=DATA[code].blanks[k];
+  if(!v||!Array.isArray(v)) return null;
+  var topRe=code==='15044'?/^(绪?论|导论|第[一二三四五六七八九十]+章|[一二三四五六七八九十]、)/:(code==='15040'?/^(习近平新时代中国特色社会主义思想|导论|第[一二三四五六七八九十]+章)/:/^(第[一二三四五六七八九十]+部分|第[一二三四五六七八九十]+章)/);
+  var out=[]; v.forEach(function(it){ if(it&&it.header&&topRe.test(it.header)) out.push(it.header); });
+  return out.length?out:null;
+}
 function setSubActive(mod,k){
   document.querySelectorAll('.nav-sub-item').forEach(function(n){ n.classList.remove('active'); });
   if(!mod||!k) return;
@@ -1286,7 +1318,16 @@ function buildSidebar(code){
     for(var i=0;i<ks.length;i++){
       var k=ks[i], lab=k;
       if(Array.isArray(k)){ lab=k[1]; k=k[0]; }
-      h+='<div class="nav-sub-item '+cls+'" data-mod="'+mod+'" data-k="'+esc(k)+'" onclick="navGo(\''+code+'\',\''+mod+'\',\''+esc(k)+'\')">'+lab+'</div>';
+      var chs=navChapters(code,mod,k);
+      var go='navGo(\''+code+'\',\''+mod+'\',\''+esc(k)+'\')';
+      h+='<div class="nav-sub-item '+cls+'" data-mod="'+mod+'" data-k="'+esc(k)+'" onclick="'+(chs?go+';toggleNavSub3(this)':go)+'">'+lab+'</div>';
+      if(chs){
+        h+='<div class="nav-sub3">';
+        for(var c=0;c<chs.length;c++){
+          h+='<div class="nav-sub3-item" onclick="'+go+';setTimeout(function(){try{window.ktGo('+c+')}catch(e){}},60)">'+escHtml(chs[c])+'</div>';
+        }
+        h+='</div>';
+      }
     }
     return h;
   }
@@ -1306,7 +1347,7 @@ function buildSidebar(code){
   if(code==='13000'){
     var ehtml='<div class="nav-item" onclick="showHome()">← 返回首页</div>';
     ehtml+='<div class="nav-section">'+s.name+'</div>';
-    ehtml+='<div class="nav-item" data-mod="overview" onclick="showOverview(\''+code+'\')">📚 总览</div>';
+    ehtml+='<div class="nav-item" data-mod="overview" onclick="showOverview(\''+code+'\')">🏠 总览</div>';
     ehtml+='<div class="nav-item" data-mod="pred" onclick="setActive(\'pred\');showPred(\''+code+'\')">🔮 真题预测</div>';
     ehtml+='<div class="nav-item nav-sec" data-mod="sets" onclick="toggleNavSec(\'sets\');showSets(\''+code+'\')"><span class="nav-toggle">▶</span>📝 历年真题</div>'+sub('sets',yearSets);
     var skillSrc={};
@@ -1337,27 +1378,27 @@ function buildSidebar(code){
       var __rnames2=['阅读判断','阅读选择','概括段落大意和补全句子','填句补文','填词补文','完形补文','短文写作'];
       var __ralive2=[];
       for(var __ri2=0;__ri2<__rnames2.length;__ri2++){ var __ek2=(__rnames2[__ri2]==='完形补文')?'完型补文':__rnames2[__ri2]; if(skillQsGet('13000',__ek2)) __ralive2.push(__rnames2[__ri2]); }
-      ehtml+='<div class="nav-item nav-sec" data-mod="skillreading" onclick="toggleNavSec(\'skillreading\');showSkillReadingHome(\''+code+'\')"><span class="nav-toggle">▶</span>📝 专项训练</div>'+sub('skillreading',__ralive2);
+      ehtml+='<div class="nav-item nav-sec" data-mod="skillreading" onclick="toggleNavSec(\'skillreading\');showSkillReadingHome(\''+code+'\')"><span class="nav-toggle">▶</span>🎯 专项训练</div>'+sub('skillreading',__ralive2);
     }
     if(s.vocab&&s.vocab.length){
-      ehtml+='<div class="nav-item nav-sec" data-mod="vocab" onclick="toggleNavSec(\'vocab\');showVocab(\''+code+'\',\'卡片速记\')"><span class="nav-toggle">▶</span>📖 背单词</div>'
+      ehtml+='<div class="nav-item nav-sec" data-mod="vocab" onclick="toggleNavSec(\'vocab\');showVocab(\''+code+'\',\'卡片速记\')"><span class="nav-toggle">▶</span>📕 背单词</div>'
           +sub('vocab',['卡片速记','自测模式','单词列表','复习错词','高频词汇','词组表','话题词汇','同义替换','句型框架','动词四态','常考副词','词性转换']);
     }
     if(blankCards.length>0){
       ehtml+='<div class="nav-item nav-sec" data-mod="blanks" onclick="toggleNavSec(\'blanks\');showBlanks(\''+code+'\')"><span class="nav-toggle">▶</span>🔍 挖空背诵</div>'+sub('blanks',blankCards);
     }
     if(sprintGroups.length){
-      ehtml+='<div class="nav-item nav-sec" data-mod="sprint" data-mods="prediction practice" onclick="toggleNavSec(\'sprint\');showPrediction(\''+code+'\')"><span class="nav-toggle">▶</span>🎯 考前冲刺</div>'+group('sprint',sprintGroups);
+      ehtml+='<div class="nav-item nav-sec" data-mod="sprint" data-mods="prediction practice" onclick="toggleNavSec(\'sprint\');showPrediction(\''+code+'\')"><span class="nav-toggle">▶</span>⚡ 考前冲刺</div>'+group('sprint',sprintGroups);
     }
     /* —— 背诵/资料区 —— */
     if(s.essay&&(s.essay.overview||s.essay.essays)){
       ehtml+='<div class="nav-item nav-sec" data-mod="writing" data-mods="essayzone essaymat" onclick="toggleNavSec(\'writing\');showEssayHome(\''+code+'\')"><span class="nav-toggle">▶</span>✍️ 写作</div>'
         +group('writing',[
           {icon:'🔥',label:'短文写作',mod:'essayzone',items:['写作思路','常用句型','真题范文','关联词']},
-          {icon:'✍️',label:'作文素材',mod:'essaymat',items:['逻辑词','凑字神句','好句子','写作框架','预测范文']}
+          {icon:'🗂️',label:'作文素材',mod:'essaymat',items:['逻辑词','凑字神句','好句子','写作框架','预测范文']}
         ]);
     }
-    ehtml+='<div class="nav-item" data-mod="vocabwrite" onclick="showRawBlanks(\''+code+'\',\'重点词汇默写\');setActive(\'vocabwrite\')">✍️ 重点词汇默写</div>';
+    ehtml+='<div class="nav-item" data-mod="vocabwrite" onclick="showRawBlanks(\''+code+'\',\'重点词汇默写\');setActive(\'vocabwrite\')">🖊️ 重点词汇默写</div>';
     if(s.grammar&&s.grammar.length){
       ehtml+='<div class="nav-item nav-sec" data-mod="grammar" onclick="toggleNavSec(\'grammar\');showGrammar(\''+code+'\')"><span class="nav-toggle">▶</span>📗 语法锦囊</div>'
           +sub('grammar',['第一部分 名词复数','第二部分 代词','第三部分 动词的时态和被动语态','第四部分 冠词','第五部分 介词与介词词组','第六部分 连词','第七部分 数词','第八部分 形容词与副词','第九部分 句子成分与基本句型','第十部分 非谓语动词','第十一部分 简单句与复合句']);
@@ -1368,7 +1409,7 @@ function buildSidebar(code){
   }
   let html='<div class="nav-item" onclick="showHome()">← 返回首页</div>';
   html+='<div class="nav-section">'+s.name+'</div>';
-  html+='<div class="nav-item" data-mod="overview" onclick="showOverview(\''+code+'\')">📚 总览</div>';
+  html+='<div class="nav-item" data-mod="overview" onclick="showOverview(\''+code+'\')">🏠 总览</div>';
   if(yearSets.length>0){
     html+='<div class="nav-item" data-mod="pred" onclick="setActive(\'pred\');showPred(\''+code+'\')">🔮 真题预测</div>';
   }
@@ -1389,18 +1430,18 @@ function buildSidebar(code){
   }
   if(code==='15043'){
     html+='<div class="nav-item nav-sec" data-mod="fcflip" onclick="toggleNavSec(\'fcflip\');showFlipCardsBlank(\'15043\',\'密押选择题考点100题\');setActive(\'fcflip\')"><span class="nav-toggle">▶</span>🃏 密押考点速记</div>'+sub('fcflip',['卡片速记','列表']);
-    html+='<div class="nav-item nav-sec" data-mod="ks60" onclick="toggleNavSec(\'ks60\');navGo(\'15043\',\'ks60\',\'选择题·10章\')"><span class="nav-toggle">▶</span>🚀 考前60分冲刺</div>'+sub('ks60',['选择题·10章','主观题汇总']);
+    html+='<div class="nav-item nav-sec" data-mod="ks60" onclick="toggleNavSec(\'ks60\');navGo(\'15043\',\'ks60\',\'选择题·10章\')"><span class="nav-toggle">▶</span>⚡ 考前60分冲刺</div>'+sub('ks60',['选择题·10章','主观题汇总']);
   }
   if(blankCards.length>0){
     var __bk=blankCards;
     if(code==='15043'){
       __bk=blankCards.filter(function(x){ return x!=='模块汇总资料'&&x!=='密押选择题考点100题'&&x!=='考前60分'&&x!=='填空题高频考点'&&x!=='第一章填空题'; });
       html+='<div class="nav-item nav-sec" data-mod="blanks" onclick="toggleNavSec(\'blanks\');showBlanks(\''+code+'\')"><span class="nav-toggle">▶</span>🔍 挖空背诵</div>'
-        +sub('blanks',[['考点磨练','考点磨练（622 条）'],['高频考点2604','高频考点（81 考点）'],['考前30天','考前30天带背（813 条）'],['考前10页纸','考前10页纸'],['密押','密押带背'],['2510提分宝典','2510提分宝典（1314 条）'],['笔记汇总','笔记汇总（思维导图）']]);
+        +sub('blanks',[['考点磨练','考点磨练（622 条）'],['高频考点2604','高频考点（81 考点）'],['考前30天','分章考点速背（813 条）'],['考前10页纸','章节速记手册'],['密押','题型密押速记'],['2510提分宝典','考点精讲·题型标注（1314 条）'],['笔记汇总','笔记汇总（思维导图）']]);
     } else if(code==='15044'){
       __bk=blankCards.filter(function(x){ return x!=='万能答题模板'; });
       html+='<div class="nav-item nav-sec" data-mod="blanks" onclick="toggleNavSec(\'blanks\');showBlanks(\''+code+'\')"><span class="nav-toggle">▶</span>🔍 挖空背诵</div>'
-        +sub('blanks',[['考点磨练','考点磨练（82 条）'],['高频考点2604','高频考点（102 考点）'],['考前30天','考前30天带背（167 条）'],['考前10页纸','考前10页纸（88 条）'],['复习重点2','复习重点2（261 条）'],['密押','密押带背（174 条）'],['考前60分','考前60分（781 条）'],['思维导图','思维导图（8 张）']]);
+        +sub('blanks',[['考点磨练','考点磨练（82 条）'],['高频考点2604','高频考点（102 考点）'],['考前30天','分章考点速背（167 条）'],['考前10页纸','章节速记手册（88 条）'],['复习重点2','复习重点2（261 条）'],['密押','题型密押速记（174 条）'],['考前60分','考前60分（781 条）'],['思维导图','思维导图（8 张）']]);
     } else if(code==='15040'){
       html+='<div class="nav-item nav-sec" data-mod="blanks" onclick="toggleNavSec(\'blanks\');showBlanks(\''+code+'\')"><span class="nav-toggle">▶</span>🔍 挖空背诵</div>'
         +sub('blanks',[['密押·填空100题','密押·填空100题（131 条）'],['思维导图','思维导图（19 张）']]);
@@ -1409,7 +1450,7 @@ function buildSidebar(code){
     }
   }
   if(predSets.length+predQA.length+predRaw.length>0){
-    html+='<div class="nav-item nav-sec" data-mod="prediction" onclick="toggleNavSec(\'prediction\');showPrediction(\''+code+'\')"><span class="nav-toggle">▶</span>🎯 考前模拟卷</div>';
+    html+='<div class="nav-item nav-sec" data-mod="prediction" onclick="toggleNavSec(\'prediction\');showPrediction(\''+code+'\')"><span class="nav-toggle">▶</span>⚡ 考前冲刺</div>';
     if(predQA.length+predRaw.length>0){
       html+=group('prediction',[{icon:'📋',label:'试卷',items:predSets},{icon:'📝',label:'简答题',items:predQAShort},{icon:'📝',label:'论述题',items:predQAEssay},{icon:'📖',label:'带背/汇总',items:predQABeidai},{icon:'📄',label:'文本',items:predRaw},{icon:'📂',label:'其他',items:predQAOther}]);
     } else {
@@ -1442,11 +1483,11 @@ function buildSidebar(code){
         +sub('essayzone',['写作思路','常用句型','真题范文','关联词']);
   }
   if(code==='13000'&&(s.essaymat&&(s.essaymat.logic||s.essaymat.predicts))){
-    html+='<div class="nav-item nav-sec" data-mod="essaymat" onclick="toggleNavSec(\'essaymat\');showEssayMat(\''+code+'\')"><span class="nav-toggle">▶</span>✍️ 作文素材</div>'
+    html+='<div class="nav-item nav-sec" data-mod="essaymat" onclick="toggleNavSec(\'essaymat\');showEssayMat(\''+code+'\')"><span class="nav-toggle">▶</span>🗂️ 作文素材</div>'
         +sub('essaymat',['逻辑词','凑字神句','好句子','写作框架','预测范文']);
   }
   if(code==='13000'&&(s.vocab&&s.vocab.length)){
-    html+='<div class="nav-item nav-sec" data-mod="vocab" onclick="toggleNavSec(\'vocab\');showVocab(\''+code+'\',\'卡片速记\')"><span class="nav-toggle">▶</span>📖 背单词</div>'
+    html+='<div class="nav-item nav-sec" data-mod="vocab" onclick="toggleNavSec(\'vocab\');showVocab(\''+code+'\',\'卡片速记\')"><span class="nav-toggle">▶</span>📕 背单词</div>'
         +sub('vocab',['卡片速记','自测模式','单词列表','复习错词','高频词汇','词组表','话题词汇','同义替换','句型框架','动词四态','常考副词','词性转换']);
   }
   if(code==='13000'&&(s.grammar&&s.grammar.length)){
@@ -1457,7 +1498,7 @@ function buildSidebar(code){
     var __rnames=['阅读判断','阅读选择','概括段落大意和补全句子','填句补文','填词补文','完形补文','短文写作'];
     var __ralive=[];
     for(var __ri=0;__ri<__rnames.length;__ri++){ var __ek=(__rnames[__ri]==='完形补文')?'完型补文':__rnames[__ri]; if(skillQsGet('13000',__ek)) __ralive.push(__rnames[__ri]); }
-    html+='<div class="nav-item nav-sec" data-mod="skillreading" onclick="toggleNavSec(\'skillreading\');showSkillReadingHome(\''+code+'\')"><span class="nav-toggle">▶</span>📝 专项训练</div>'
+    html+='<div class="nav-item nav-sec" data-mod="skillreading" onclick="toggleNavSec(\'skillreading\');showSkillReadingHome(\''+code+'\')"><span class="nav-toggle">▶</span>🎯 专项训练</div>'
         +sub('skillreading',__ralive);
   }
   sb.innerHTML=html;
@@ -1729,16 +1770,16 @@ function showOverview(code){
   if(code==='15040'){ html+='<div class="mod" onclick="showZxHome(\''+code+'\')"><div class="icon">🎯</div><div class="name">专项训练</div><div class="cnt">3 题型 · 单选/简答/论述</div></div>'; }
   if(code!=='13000'&&code!=='15043'&&code!=='15044'){ html+='<div class="mod" onclick="showQA(\''+code+'\')"><div class="icon">📖</div><div class="name">主观题背诵</div><div class="cnt">'+qaCount+' 组资料</div></div>'; }
   if(code!=='13000'){ html+='<div class="mod" onclick="showBlanks(\''+code+'\')"><div class="icon">🔍</div><div class="name">挖空背诵</div><div class="cnt">'+blankCount+' 组</div></div>'; }
-  if(code!=='13000'){ html+='<div class="mod" onclick="showPrediction(\''+code+'\')"><div class="icon">🎯</div><div class="name">考前模拟卷</div><div class="cnt">'+predCount+' 组</div></div>'; }
+  if(code!=='13000'){ html+='<div class="mod" onclick="showPrediction(\''+code+'\')"><div class="icon">⚡</div><div class="name">考前冲刺</div><div class="cnt">'+predCount+' 组</div></div>'; }
   if(code!=='13000'&&code!=='15043'&&code!=='15044'&&code!=='15040'){ html+='<div class="mod" onclick="showPractice(\''+code+'\')"><div class="icon">✏️</div><div class="name">练习/刷题</div><div class="cnt">'+practiceCount+' 套</div></div>'; } // 史纲/马原/新思想练习类习题已归入专项训练
   if(code!=='13000'){ html+='<div class="mod" onclick="((s.blanks&&s.blanks["万能答题模板"])?showRawBlanks(\''+code+'\',\'万能答题模板\'):showQAGroup(\''+code+'\',\'万能答题模板\',\'template\'))"><div class="icon">📋</div><div class="name">万能答题模板</div><div class="cnt">'+(hasTemplate?'1 份':'0 份')+'</div></div>'; }
   if(code!=='13000'){ html+='<div class="mod" onclick="showStudyStats()"><div class="icon">📊</div><div class="name">学习统计</div><div class="cnt">进度/打卡</div></div>'; }
-  if(code==='13000'&&(s.blanks&&s.blanks['重点词汇默写'])){ html+='<div class="mod" onclick="showRawBlanks(\''+code+'\',\'重点词汇默写\')"><div class="icon">✍️</div><div class="name">重点词汇默写</div><div class="cnt">1 份</div></div>'; }
-  if(code==='13000'&&(s.vocab&&s.vocab.length)){ html+='<div class="mod" onclick="showVocab('+code+',\'卡片速记\')"><div class="icon">📖</div><div class="name">背单词</div><div class="cnt">'+s.vocab.length+' 词</div></div>'; }
+  if(code==='13000'&&(s.blanks&&s.blanks['重点词汇默写'])){ html+='<div class="mod" onclick="showRawBlanks(\''+code+'\',\'重点词汇默写\')"><div class="icon">🖊️</div><div class="name">重点词汇默写</div><div class="cnt">1 份</div></div>'; }
+  if(code==='13000'&&(s.vocab&&s.vocab.length)){ html+='<div class="mod" onclick="showVocab('+code+',\'卡片速记\')"><div class="icon">📕</div><div class="name">背单词</div><div class="cnt">'+s.vocab.length+' 词</div></div>'; }
   if(code==='13000'&&(s.grammar&&s.grammar.length)){ html+='<div class="mod" onclick="showGrammar('+code+')"><div class="icon">📗</div><div class="name">语法锦囊</div><div class="cnt">'+s.grammar.length+' 部分</div></div>'; }
-  if(code==='13000'&&skillQsGet('13000','阅读选择')){ html+='<div class="mod" onclick="showSkillReadingHome('+code+')"><div class="icon">📝</div><div class="name">专项训练</div><div class="cnt">7 题型 · 真题分组</div></div>'; }
+  if(code==='13000'&&skillQsGet('13000','阅读选择')){ html+='<div class="mod" onclick="showSkillReadingHome('+code+')"><div class="icon">🎯</div><div class="name">专项训练</div><div class="cnt">7 题型 · 真题分组</div></div>'; }
   if(code==='13000'&&(s.essay&&(s.essay.overview||s.essay.essays))){ html+='<div class="mod" onclick="showEssayHome('+code+')"><div class="icon">✍️</div><div class="name">写作</div><div class="cnt">2 组</div></div>'; }
-  if(code==='13000'&&(predSets.length>0||sprintPractice.length>0)){ html+='<div class="mod" onclick="showPrediction(\''+code+'\')"><div class="icon">🎯</div><div class="name">考前冲刺</div><div class="cnt">'+(predSets.length+sprintPractice.length)+' 组</div></div>'; }
+  if(code==='13000'&&(predSets.length>0||sprintPractice.length>0)){ html+='<div class="mod" onclick="showPrediction(\''+code+'\')"><div class="icon">⚡</div><div class="name">考前冲刺</div><div class="cnt">'+(predSets.length+sprintPractice.length)+' 组</div></div>'; }
   
   html+='</div>';
   document.getElementById('main-content').innerHTML=html;
@@ -1824,9 +1865,9 @@ function showTimeline(code,period){
 function showPrediction(code){
   setActive('prediction');
   var __predMod=(code==='13000')?'sprint':'prediction';
-  if(showModOverview(code,__predMod,code==='13000'?'考前冲刺':'考前模拟卷','🎯')) return;
+  if(showModOverview(code,__predMod,'考前冲刺','⚡')) return;
   const s=DATA[code];
-  document.getElementById('tb-crumb').textContent='首页 / '+s.name+' / 考前模拟卷';
+  document.getElementById('tb-crumb').textContent='首页 / '+s.name+' / 考前冲刺';
   var allSets = Object.keys(s.sets||{});
   var allQA = Object.keys(s.qa||{});
   var allBlanks = Object.keys(s.blanks||{});
@@ -1852,7 +1893,7 @@ function showPrediction(code){
   var predQABeidai=predQA.filter(function(k){ return k.indexOf('带背')>=0||k.indexOf('笔记汇总')>=0; });
   var predQAOther=predQA.filter(function(k){ return predQAShort.indexOf(k)<0&&predQAEssay.indexOf(k)<0&&predQABeidai.indexOf(k)<0&&k!=='主观题汇总密训'; });
   
-  let html='<div style="font-size:17px;font-weight:700;margin-bottom:10px">考前模拟卷</div>';
+  let html='<div style="font-size:17px;font-weight:700;margin-bottom:10px">考前冲刺</div>';
   if(predSets.length===0&&predQA.length===0&&predRaw.length===0){
     html+='<div style="color:#767676;padding:20px">暂无资料</div>';
   }
@@ -3750,7 +3791,7 @@ function showVocab(code, mode){
   document.getElementById('tb-title').textContent=s.name+' · 背单词';
   var st=vocabStats();
   var html='<span class="back2" onclick="showOverview(\''+code+'\')">← 返回</span>';
-  html+='<div style="font-size:17px;font-weight:700;margin:4px 0 8px">📖 背单词（'+arr.length+' 词）</div>';
+  html+='<div style="font-size:17px;font-weight:700;margin:4px 0 8px">📕 背单词（'+arr.length+' 词）</div>';
   html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">'
     +'<button class="mini-btn" style="padding:6px 14px" onclick="showVocab(\''+code+'\',\'卡片速记\')">🎴 卡片速记</button>'
     +'<button class="mini-btn" style="padding:6px 14px" onclick="showVocab(\''+code+'\',\'自测模式\')">📝 自测模式</button>'
@@ -4605,8 +4646,8 @@ function showBlanks(code){
   var __skip13000={};
   ['重点词汇默写','做题方法与技巧','应试技巧（新题型）','自考英语二课后题答案（教材课后练习参考答案）'].forEach(function(k){ __skip13000[k]=1; });
   var __bl={};
-  if(code==='15043'){ __bl['考点磨练']='考点磨练（622 条）'; __bl['高频考点2604']='高频考点（81 考点）'; __bl['考前30天']='考前30天带背（813 条）'; __bl['考前10页纸']='考前10页纸'; __bl['密押']='密押带背'; __bl['2510提分宝典']='2510提分宝典（1314 条）'; __bl['笔记汇总']='笔记汇总（思维导图）'; }
-  if(code==='15044'){ __bl['考点磨练']='考点磨练（82 条）'; __bl['高频考点2604']='高频考点（102 考点）'; __bl['考前30天']='考前30天带背（167 条）'; __bl['考前10页纸']='考前10页纸（88 条）'; __bl['复习重点2']='复习重点2（261 条）'; __bl['密押']='密押带背（174 条）'; __bl['考前60分']='考前60分（781 条）'; __bl['思维导图']='思维导图（8 张）'; }
+  if(code==='15043'){ __bl['考点磨练']='考点磨练（622 条）'; __bl['高频考点2604']='高频考点（81 考点）'; __bl['考前30天']='分章考点速背（813 条）'; __bl['考前10页纸']='章节速记手册'; __bl['密押']='题型密押速记'; __bl['2510提分宝典']='考点精讲·题型标注（1314 条）'; __bl['笔记汇总']='笔记汇总（思维导图）'; }
+  if(code==='15044'){ __bl['考点磨练']='考点磨练（82 条）'; __bl['高频考点2604']='高频考点（102 考点）'; __bl['考前30天']='分章考点速背（167 条）'; __bl['考前10页纸']='章节速记手册（88 条）'; __bl['复习重点2']='复习重点2（261 条）'; __bl['密押']='题型密押速记（174 条）'; __bl['考前60分']='考前60分（781 条）'; __bl['思维导图']='思维导图（8 张）'; }
   if(code==='15040'){ __bl['密押·填空100题']='密押·填空100题（131 条）'; }
   if(code==='15040'){ html+='<div class="chap-row" onclick="navGo(\'15040\',\'blanks\',\'思维导图\')"><div><div class="t">思维导图</div><div class="m">19 张</div></div><div class="go">开始 →</div></div>'; }
   if(code==='15044'){ html+='<div class="chap-row" onclick="navGo(\'15044\',\'blanks\',\'思维导图\')"><div><div class="t">思维导图</div><div class="m">8 张</div></div><div class="go">开始 →</div></div>'; }
@@ -8564,9 +8605,9 @@ function startBlankReview(code,k){
     });
   }
   var __tl={};
-  if(code==='15043'){ __tl['考点磨练']='考点磨练（622 条）'; __tl['高频考点2604']='高频考点（81 考点）'; __tl['考前30天']='考前30天带背（813 条）'; __tl['考前10页纸']='考前10页纸'; __tl['密押']='密押带背'; __tl['2510提分宝典']='2510提分宝典（1314 条）'; __tl['笔记汇总']='笔记汇总（思维导图）'; }
+  if(code==='15043'){ __tl['考点磨练']='考点磨练（622 条）'; __tl['高频考点2604']='高频考点（81 考点）'; __tl['考前30天']='分章考点速背（813 条）'; __tl['考前10页纸']='章节速记手册'; __tl['密押']='题型密押速记'; __tl['2510提分宝典']='考点精讲·题型标注（1314 条）'; __tl['笔记汇总']='笔记汇总（思维导图）'; }
   if(code==='15040'){ __tl['思维导图']='思维导图（19 张）'; }
-  if(code==='15044'){ __tl['考点磨练']='考点磨练（82 条）'; __tl['高频考点2604']='高频考点（102 考点）'; __tl['考前30天']='考前30天带背（167 条）'; __tl['考前10页纸']='考前10页纸（88 条）'; __tl['复习重点2']='复习重点2（261 条）'; __tl['密押']='密押带背（174 条）'; __tl['考前60分']='考前60分（781 条）'; __tl['思维导图']='思维导图（8 张）'; }
+  if(code==='15044'){ __tl['考点磨练']='考点磨练（82 条）'; __tl['高频考点2604']='高频考点（102 考点）'; __tl['考前30天']='分章考点速背（167 条）'; __tl['考前10页纸']='章节速记手册（88 条）'; __tl['复习重点2']='复习重点2（261 条）'; __tl['密押']='题型密押速记（174 条）'; __tl['考前60分']='考前60分（781 条）'; __tl['思维导图']='思维导图（8 张）'; }
   const tl=__tl[k]||k;
   document.getElementById('tb-crumb').textContent='首页 / '+s.name+' / 挖空背诵 / '+tl;
   document.getElementById('tb-title').textContent=s.name+' · 挖空背诵 · '+tl;
@@ -10585,6 +10626,14 @@ function closeKp(){
   var el=document.getElementById('kp-overlay');
   if(el) el.remove();
 }
+document.addEventListener('keydown',function(ev){
+  if(ev.key!=='Escape'&&ev.keyCode!==27) return;
+  try{
+    var m=document.getElementById('fm-mask'); if(m){ m.remove(); return; }
+    var kp=document.getElementById('kp-overlay'); if(kp){ closeKp(); return; }
+    var mn=document.getElementById('mNavMask'); if(mn&&mn.style.display==='block'){ toggleMNav(false); return; }
+  }catch(e){}
+});
 
 function scrollToQ(idx){
   if(!abState) return;
@@ -11421,7 +11470,7 @@ window.showFlipMatch=function(code,key,dataArr){
     }
     return shuffle(ps);
   }
-  function tick(){ elapsed=Math.floor((Date.now()-startTs)/1000); var el=document.getElementById('fm-timer'); if(el) el.textContent='⏱ '+elapsed+' 秒'; }
+  function tick(){ if(!document.getElementById('fm-grid')){ clearInterval(timerId); return; } elapsed=Math.floor((Date.now()-startTs)/1000); var el=document.getElementById('fm-timer'); if(el) el.textContent='⏱ '+elapsed+' 秒'; }
   function startTimer(){
     startTs=Date.now(); elapsed=0; running=true;
     clearInterval(timerId); timerId=setInterval(tick,500); tick();
@@ -12178,6 +12227,13 @@ try{ var __ld=document.getElementById('app-loading'); if(__ld&&__ld.parentNode) 
   var inp=document.getElementById('zk-pass');
   if(inp) inp.addEventListener('keydown',function(ev){ if(ev.key==='Enter'){ try{ window.ZK_unlock(); }catch(e){} } });
 })();
+try{
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',function(){
+      navigator.serviceWorker.register('sw.js').catch(function(){});
+    });
+  }
+}catch(e){}
 </script>
 
 </body>
