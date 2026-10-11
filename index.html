@@ -656,15 +656,90 @@ body.eng-exam-mode .q-text .qscore{color:var(--sub);font-size:13px;margin-right:
           <div class="name">马克思主义基本原理</div>
           <div class="cnt">真题+复习资料</div>
         </div>
-
         <div class="subj" onclick="goSubject('13000')">
           <div class="code">课程代码 13000</div>
           <div class="name">英语（专升本）</div>
           <div class="cnt">真题+复习资料</div>
-        </div>        <div class="subj" onclick="goSubject('15040')">
+        </div>
+        <div class="subj" onclick="goSubject('15040')">
           <div class="code">课程代码 15040</div>
           <div class="name">习近平新时代中国特色社会主义思想概论</div>
           <div class="cnt">真题+笔记+背诵</div>
+        </div>
+        <div class="subj" onclick="goSubject('00536')">
+          <div class="code">课程代码 00536</div>
+          <div class="name">古代汉语</div>
+          <div class="cnt">真题31套·笔记/翻译/背诵全量</div>
+        </div>
+        <div class="subj" onclick="goSubject('11344')">
+          <div class="code">课程代码 11344</div>
+          <div class="name">中国近代文学史</div>
+          <div class="cnt">8套真题+背诵资料</div>
+        </div>
+        <div class="subj" onclick="goSubject('11501')">
+          <div class="code">课程代码 11501</div>
+          <div class="name">中国当代文学史</div>
+          <div class="cnt">5套真题+背诵资料</div>
+        </div>
+        <div class="subj" onclick="goSubject('00537')">
+          <div class="code">课程代码 00537</div>
+          <div class="name">中国现代文学史</div>
+          <div class="cnt">真题22套+背诵资料</div>
+        </div>
+        <div class="subj" onclick="goSubject('00538')">
+          <div class="code">课程代码 00538</div>
+          <div class="name">中国古代文学史（一）</div>
+          <div class="cnt">真题31套+背诵资料</div>
+        </div>
+        <div class="subj" onclick="goSubject('00539')">
+          <div class="code">课程代码 00539</div>
+          <div class="name">中国古代文学史（二）</div>
+          <div class="cnt">真题33套+背诵资料</div>
+        </div>
+        <div class="subj" onclick="goSubject('00540')">
+          <div class="code">课程代码 00540</div>
+          <div class="name">外国文学史</div>
+          <div class="cnt">真题29套+背诵资料</div>
+        </div>
+        <div class="subj" onclick="goSubject('00821')">
+          <div class="code">课程代码 00821</div>
+          <div class="name">现代汉语语法研究</div>
+          <div class="cnt">8套真题+背诵资料</div>
+        </div>
+        <div class="subj" onclick="goSubject('00037')">
+          <div class="code">课程代码 00037</div>
+          <div class="name">美学</div>
+          <div class="cnt">真题22套+背诵资料</div>
+        </div>
+        <div class="subj" onclick="goSubject('00541')">
+          <div class="code">课程代码 00541</div>
+          <div class="name">语言学概论</div>
+          <div class="cnt">12套真题+背诵资料</div>
+        </div>
+        <div class="subj" onclick="goSubject('11346')">
+          <div class="code">课程代码 11346</div>
+          <div class="name">近代汉语</div>
+          <div class="cnt">7套真题+背诵资料</div>
+        </div>
+        <div class="subj" onclick="goSubject('00816')">
+          <div class="code">课程代码 00816</div>
+          <div class="name">文艺心理学</div>
+          <div class="cnt">4套真题+必刷题库+讲义/导图</div>
+        </div>
+        <div class="subj" onclick="goSubject('13426')">
+          <div class="code">课程代码 13426</div>
+          <div class="name">当代文学思潮专题</div>
+          <div class="cnt">章节习题+模拟题+背诵考点</div>
+        </div>
+        <div class="subj" onclick="goSubject('10396')">
+          <div class="code">课程代码 10396</div>
+          <div class="name">比较文学研究</div>
+          <div class="cnt">速记宝典+考前资料+电子教辅</div>
+        </div>
+        <div class="subj" onclick="goSubject('00815')">
+          <div class="code">课程代码 00815</div>
+          <div class="name">西方文论选读</div>
+          <div class="cnt">题海+思维导图+考前60分</div>
         </div>
       </div>
     </div>
@@ -724,7 +799,7 @@ document.addEventListener('click',function(e){
 });
 function gsRun(q){
   var box=document.getElementById('gsearch-res'); if(!box) return;
-  var codes=['15043','15044','15040','13000'];
+  var codes=['15043','11344','15044','15040','13000','11501','00536','00537','00538','00539','00540','00821','00037','00541','11346','00816','13426','10396','00815'];
   var need=[];
   codes.forEach(function(c){ if(!(typeof DATA!=='undefined' && DATA[c])) need.push('data_'+c+'.js'); });
   if(need.length){
@@ -963,10 +1038,10 @@ function judgeMulti(btn, id){
   const optsWrap = card.querySelector('.opts');
   const picked = [];
   optsWrap.querySelectorAll('.opt').forEach((ob, oi) => {
-    if(ob.classList.contains('selected')) picked.push('ABCD'[oi]);
+    if(ob.classList.contains('selected')) picked.push('ABCDEFGHIJKLMNOPQRSTUVWXYZ'[oi]);
     ob.disabled = true;
     ob.classList.remove('selected');
-    const letter = 'ABCD'[oi];
+    const letter = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[oi];
     if(correctAns.includes(letter)){
       ob.classList.add('correct');
     }
@@ -981,7 +1056,7 @@ function judgeMulti(btn, id){
   if(right) removeFromWrong(id); else addToWrong(id);
   const ab = card.querySelector('.ans-box');
   ab.innerHTML = `<div class="ans-row"><span class="ans-tag tag-ans">答案</span><span class="av"><b>${item.a}</b></span></div>
-    <div class="ans-row"><span class="ans-tag tag-exp">解析</span><span class="av">${item.e}</span></div>`;
+    ${(item.e&&String(item.e).trim()&&String(item.e).trim()!=='undefined')?'<div class="ans-row"><span class="ans-tag tag-exp">解析</span><span class="av">'+escHtml(String(item.e))+'</span></div>':''}`;
   ab.classList.add('show');
   updateAnswerBar();
   btn.textContent = '收起答案与解析';
@@ -1029,7 +1104,7 @@ function revealChoice(btn,id){
   const ab=card.querySelector('.ans-box');
   let mark='<b>'+'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[item.a]+'</b>';
   ab.innerHTML=`<div class="ans-row"><span class="ans-tag tag-ans">答案</span><span class="av">${mark}</span></div>
-    <div class="ans-row"><span class="ans-tag tag-exp">解析</span><span class="av">${item.e}</span></div>`;
+    ${(item.e&&String(item.e).trim()&&String(item.e).trim()!=='undefined')?'<div class="ans-row"><span class="ans-tag tag-exp">解析</span><span class="av">'+escHtml(String(item.e))+'</span></div>':''}`;
   ab.classList.add('show');
   if(picked!==item.a) addToWrong(id); else removeFromWrong(id);
   btn.textContent='收起答案与解析';
@@ -1330,7 +1405,7 @@ function buildSidebar(code){
   const coreBlanks=allBlanks.filter(function(k){ var v=s.blanks[k]; return v&&v.type!=='raw'&&k.indexOf('核心考点')>=0; });
   const blankCards=allBlanks.filter(function(k){ var v=s.blanks[k]; return v&&v.type!=='raw'&&k.indexOf('核心考点')<0&&k!=='万能答题模板'; });
   const hasTpl=!!((s.qa&&s.qa['万能答题模板'])||(s.blanks&&s.blanks["万能答题模板"]));
-  if(code==='15044'||code==='15040'){ practiceQA.length=0; practiceRaw.length=0; practiceSets=[]; } // 马原/新思想练习类主观题已全部并入专项训练（声明后再清空）
+  if(code==='15044'||code==='15040'||code==='11344'||code==='11501'||code==='00536'||code==='00537'||code==='00538'||code==='00539'||code==='00540'||code==='00821'||code==='00037'||code==='00541'||code==='11346'||code==='00816'||code==='13426'||code==='10396'||code==='00815'){ practiceQA.length=0; practiceRaw.length=0; practiceSets=[]; } // 马原/新思想练习类主观题已全部并入专项训练；11344 及 9 门汉语言课背诵资料只走主观题背诵（声明后再清空）；00816/13426/10396/00815 广东选修背诵资料同理只走主观题背诵
   function esc(k){ return k.replace(/'/g,''); }
   function item(mod,ks,cls){
     var h='';
@@ -1453,6 +1528,10 @@ function buildSidebar(code){
     var zxTypes40=['单项选择题','简答题','论述题'];
     html+='<div class="nav-item nav-sec" data-mod="zx" onclick="toggleNavSec(\'zx\');showZxHome(\''+code+'\')"><span class="nav-toggle">▶</span>🎯 专项训练</div>'+sub('zx',zxTypes40);
   }
+  if(code==='00536'){
+    var zxTypes36=['单项选择题','简答题'];
+    html+='<div class="nav-item nav-sec" data-mod="zx" onclick="toggleNavSec(\'zx\');showZxHome(\''+code+'\')"><span class="nav-toggle">▶</span>🎯 专项训练</div>'+sub('zx',zxTypes36);
+  }
   if(code==='15043'){
     html+='<div class="nav-item nav-sec" data-mod="fcflip" onclick="toggleNavSec(\'fcflip\');showFlipCardsBlank(\'15043\',\'密押选择题考点100题\');setActive(\'fcflip\')"><span class="nav-toggle">▶</span>🃏 密押考点速记</div>'+sub('fcflip',['卡片速记','列表']);
     html+='<div class="nav-item nav-sec" data-mod="ks60" onclick="toggleNavSec(\'ks60\');navGo(\'15043\',\'ks60\',\'选择题·10章\')"><span class="nav-toggle">▶</span>⚡ 考前60分冲刺</div>'+sub('ks60',['选择题·10章','主观题汇总']);
@@ -1549,7 +1628,7 @@ function showPred(code){
   var predQOpen={}; try{ predQOpen=JSON.parse(localStorage.getItem('zikao_pred_qopen_'+code)||'{}'); }catch(e){}
   var h='';
   h+='<div style="font-size:18px;font-weight:700;margin:4px 0 6px">🔮 真题预测</div>';
-  h+='<div style="font-size:13px;color:#888;margin-bottom:10px">'+P.meta+'</div>';
+  h+='<div style="font-size:13px;color:#888;margin-bottom:10px">'+(P.meta||'')+'</div>';
   if(P.heat&&P.heat.length){
     h+='<div style="font-size:14px;font-weight:700;color:#0a7d33;margin:12px 0 6px">📊 出题热度总览</div>';
     var max=Math.max.apply(null,P.heat.map(function(x){return x.n;}));
@@ -1777,6 +1856,7 @@ function showOverview(code){
     return true;
   });
   var practiceCount = practiceSets.length + practiceQA.length + practiceRaw.length;
+  if(code==='11344'||code==='11501'||code==='00536'||code==='00537'||code==='00538'||code==='00539'||code==='00540'||code==='00821'||code==='00037'||code==='00541'||code==='11346'||code==='00816'||code==='13426'||code==='10396'||code==='00815'){ practiceCount=0; } // 11344 及 9 门汉语言课无练习/刷题独立区，背诵资料统一走主观题背诵；00816/13426/10396/00815 广东选修同理
   var sprintPractice=[];
   practiceQA.forEach(function(k){ if(k!=='主观题汇总密训'&&k!=='决胜3小时') sprintPractice.push(k); });
   practiceRaw.forEach(function(k){ if(!practiceSkillSrc[k]&&k!=='重点词汇默写') sprintPractice.push(k); });
@@ -1793,11 +1873,12 @@ function showOverview(code){
   if(code==='15043'){ html+='<div class="mod" onclick="showZxHome(\''+code+'\')"><div class="icon">🎯</div><div class="name">专项训练</div><div class="cnt">5 题型 · 按真实卷分类</div></div>'; }
   if(code==='15044'){ html+='<div class="mod" onclick="showZxHome(\''+code+'\')"><div class="icon">🎯</div><div class="name">专项训练</div><div class="cnt">3 题型 · 单选/简答/论述</div></div>'; }
   if(code==='15040'){ html+='<div class="mod" onclick="showZxHome(\''+code+'\')"><div class="icon">🎯</div><div class="name">专项训练</div><div class="cnt">3 题型 · 单选/简答/论述</div></div>'; }
+  if(code==='00536'){ html+='<div class="mod" onclick="showZxHome(\''+code+'\')"><div class="icon">🎯</div><div class="name">专项训练</div><div class="cnt">2 题型 · 标点/黄金卷</div></div>'; }
   if(code!=='13000'&&code!=='15043'&&code!=='15044'){ html+='<div class="mod" onclick="showQA(\''+code+'\')"><div class="icon">📖</div><div class="name">主观题背诵</div><div class="cnt">'+qaCount+' 组资料</div></div>'; }
-  if(code!=='13000'){ html+='<div class="mod" onclick="showBlanks(\''+code+'\')"><div class="icon">🔍</div><div class="name">挖空背诵</div><div class="cnt">'+blankCount+' 组</div></div>'; }
-  if(code!=='13000'){ html+='<div class="mod" onclick="showPrediction(\''+code+'\')"><div class="icon">⚡</div><div class="name">考前冲刺</div><div class="cnt">'+predCount+' 组</div></div>'; }
-  if(code!=='13000'&&code!=='15043'&&code!=='15044'&&code!=='15040'){ html+='<div class="mod" onclick="showPractice(\''+code+'\')"><div class="icon">✏️</div><div class="name">练习/刷题</div><div class="cnt">'+practiceCount+' 套</div></div>'; } // 史纲/马原/新思想练习类习题已归入专项训练
-  if(code!=='13000'){ html+='<div class="mod" onclick="((s.blanks&&s.blanks["万能答题模板"])?showRawBlanks(\''+code+'\',\'万能答题模板\'):showQAGroup(\''+code+'\',\'万能答题模板\',\'template\'))"><div class="icon">📋</div><div class="name">万能答题模板</div><div class="cnt">'+(hasTemplate?'1 份':'0 份')+'</div></div>'; }
+  if(code!=='13000'&&blankCount>0){ html+='<div class="mod" onclick="showBlanks(\''+code+'\')"><div class="icon">🔍</div><div class="name">挖空背诵</div><div class="cnt">'+blankCount+' 组</div></div>'; }
+  if(code!=='13000'&&predCount>0){ html+='<div class="mod" onclick="showPrediction(\''+code+'\')"><div class="icon">⚡</div><div class="name">考前冲刺</div><div class="cnt">'+predCount+' 组</div></div>'; }
+  if(code!=='13000'&&code!=='15043'&&code!=='15044'&&code!=='15040'&&practiceCount>0){ html+='<div class="mod" onclick="showPractice(\''+code+'\')"><div class="icon">✏️</div><div class="name">练习/刷题</div><div class="cnt">'+practiceCount+' 套</div></div>'; } // 史纲/马原/新思想练习类习题已归入专项训练；11344 背诵资料走主观题背诵
+  if(code!=='13000'&&hasTemplate){ html+='<div class="mod" onclick="((s.blanks&&s.blanks["万能答题模板"])?showRawBlanks(\''+code+'\',\'万能答题模板\'):showQAGroup(\''+code+'\',\'万能答题模板\',\'template\'))"><div class="icon">📋</div><div class="name">万能答题模板</div><div class="cnt">'+(hasTemplate?'1 份':'0 份')+'</div></div>'; }
   if(code!=='13000'){ html+='<div class="mod" onclick="showStudyStats()"><div class="icon">📊</div><div class="name">学习统计</div><div class="cnt">进度/打卡</div></div>'; }
   if(code==='13000'&&(s.blanks&&s.blanks['重点词汇默写'])){ html+='<div class="mod" onclick="showRawBlanks(\''+code+'\',\'重点词汇默写\')"><div class="icon">🖊️</div><div class="name">重点词汇默写</div><div class="cnt">1 份</div></div>'; }
   if(code==='13000'&&(s.vocab&&s.vocab.length)){ html+='<div class="mod" onclick="showVocab('+code+',\'卡片速记\')"><div class="icon">📕</div><div class="name">背单词</div><div class="cnt">'+s.vocab.length+' 词</div></div>'; }
@@ -2018,12 +2099,19 @@ function showSets(code){
   yKeys.concat(oKeys).forEach(k=>{
     const d=s.sets[k];
     const cn=(d.choice&&d.choice.items||[]).length;
+    const mn=(d.multi&&d.multi.items||[]).length;
     const sn=(d.short&&d.short.items||[]).length;
     const en=(d.essay&&d.essay.items||[]).length;
+    const __parts=[];
+    if(cn) __parts.push('单选'+cn);
+    if(mn) __parts.push('多选'+mn);
+    if(sn) __parts.push('简答'+sn);
+    if(en) __parts.push('论述'+en);
+    const meta=__parts.join(' · ');
     const tip=(code==='15043'&&k.indexOf('补漏百题斩')===0)?' · <span style="color:#767676">部分与高频选择题105题重复，作查漏</span>':'';
     var __dn=0;
     try{ var __sv=JSON.parse(localStorage.getItem('zikao_exam_ans_'+code+'__'+k)||'{}'); __dn=Object.keys(__sv).length; }catch(e){}
-    html+='<div class="chap-row" onclick="startQuiz(\''+code+'\',\''+k.replace(/'/g,"\\'")+'\')"><div><div class="t">'+k+'</div><div class="m">单选'+cn+' · 简答'+sn+' · 论述'+en+tip+'</div></div>'+(__dn>0?'<span style="font-size:12px;color:#2d6a4f;background:#e9f7ee;border-radius:8px;padding:1px 7px;flex:none">已答 '+__dn+'</span>':'')+'<div class="go">开始 →</div></div>';
+    html+='<div class="chap-row" onclick="startQuiz(\''+code+'\',\''+k.replace(/'/g,"\\'")+'\')"><div><div class="t">'+k+'</div><div class="m">'+meta+tip+'</div></div>'+(__dn>0?'<span style="font-size:12px;color:#2d6a4f;background:#e9f7ee;border-radius:8px;padding:1px 7px;flex:none">已答 '+__dn+'</span>':'')+'<div class="go">开始 →</div></div>';
   });
   document.getElementById('main-content').innerHTML=html;
 }
@@ -3140,7 +3228,18 @@ function zxSrc15040(){
 function zxSrcFor(code,type){ // 按科目分发专项训练资料源
   if(code==='15044') return zxSrc15044()[type]||[];
   if(code==='15040') return zxSrc15040()[type]||[];
+  if(code==='00536') return zxSrc00536()[type]||[]; // 古代汉语专项训练：标点题真题总结/考前黄金卷已并入 sets 非年份 key，直接读
   return zxSrc15043()[type]||[];
+}
+var ZX_SRC_00536=null;
+function zxSrc00536(){
+  if(ZX_SRC_00536) return ZX_SRC_00536;
+  function grp(key,kind){ return {key:key,kind:kind}; }
+  ZX_SRC_00536={
+    '单项选择题':[grp('考前黄金卷','choice')],
+    '简答题':[grp('考前黄金卷','short'),grp('标点题真题总结','short')]
+  };
+  return ZX_SRC_00536;
 }
 function zxMergeKeys(type,kind){
   var qaShort=['主观题汇总','章节主观题汇总','主观题带背','通关必备主观题110题','补漏百题斩简答补充','密押主观题','考前10页纸·主观题','笔记汇总·主观题','密押2-简答','30分大题预测','决胜3小时1','决胜3小时2'];
@@ -3183,6 +3282,13 @@ function zxShortLabel(gr){
   return gr.key;
 }
 function zxSections(type,code){
+  if(code==='00536'){
+    var S36={
+      '单项选择题':[['专项刷题',['考前黄金卷']]],
+      '简答题':[['专项刷题',['考前黄金卷','标点题真题总结']]]
+    };
+    return S36[type]||[['全部',[]]];
+  }
   if(code==='15040'){
     var yz=['2026年4月','2025年10月','2025年4月','2024年10月'];
     var S40={
@@ -9410,7 +9516,7 @@ function showHi105(){
       item.opts.forEach(function(op,i){
         var b=document.createElement('button');
         b.className='opt';
-        b.innerHTML='<span class="lab">'+'ABCD'[i]+'</span><span>'+op+'</span>';
+        b.innerHTML='<span class="lab">'+'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[i]+'</span><span>'+op+'</span>';
         b.onclick=function(){
           if(answers[id]!==undefined) return;
           answers[id]=i; saved[id]=i;
@@ -9486,7 +9592,7 @@ function showPred54(){
         item.opts.forEach(function(op,i){
           var b=document.createElement('button');
           b.className='opt';
-          b.innerHTML='<span class="lab">'+'ABCD'[i]+'</span><span>'+op+'</span>';
+          b.innerHTML='<span class="lab">'+'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[i]+'</span><span>'+op+'</span>';
           b.onclick=function(){
             if(answers[id]!==undefined) return;
             answers[id]=i; saved[id]=i;
@@ -9580,7 +9686,7 @@ function renderQuizToMain(exam, onlyType, backExpr){
           b.className='opt';
           b.setAttribute('data-ze', curSubj+'|set|'+curSet+'|'+zloc+'|opts|'+i);
           b.setAttribute('data-cur', op);
-          b.innerHTML='<span class="lab">'+'ABCD'[i]+'</span><span>'+op+'</span>';
+          b.innerHTML='<span class="lab">'+'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[i]+'</span><span>'+op+'</span>';
           b.onclick=()=>{
             if(answers[id]!==undefined)return;
             answers[id]=i;
@@ -9603,13 +9709,13 @@ function renderQuizToMain(exam, onlyType, backExpr){
           });
         }
       } else if(type==='multi'){
-        const oh=item.opts.map((op,i)=>'<button class="opt" data-ze="'+curSubj+'|set|'+curSet+'|'+zloc+'|opts|'+i+'" data-cur="'+escAttr(op)+'" onclick="multiToggle(this,\''+id+'\')"><span class="opt-letter">'+'ABCD'[i]+'</span><span>'+op+'</span></button>').join('');
+        const oh=item.opts.map((op,i)=>'<button class="opt" data-ze="'+curSubj+'|set|'+curSet+'|'+zloc+'|opts|'+i+'" data-cur="'+escAttr(op)+'" onclick="multiToggle(this,\''+id+'\')"><span class="opt-letter">'+'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[i]+'</span><span>'+op+'</span></button>').join('');
         card.innerHTML='<div class="q-head"><span class="qn">'+qno+'.</span><span class="qscore">'+scoreTxt+'</span></div><div class="q-text" data-ze="'+curSubj+'|set|'+curSet+'|'+zloc+'|q|" data-cur="'+escAttr(item.q)+'">'+item.q+'</div><div class="opts">'+oh+'</div><div class="q-actions"><button class="action-btn" onclick="judgeMulti(this,\''+id+'\')">显示答案</button>'+favBtnHTML(id)+kpBtnHTML()+'</div><div class="ans-box"></div>';
         if(answers[id]!==undefined){
           var __picked=String(answers[id]).split('');
           card.querySelectorAll('.opt').forEach((ob,oi)=>{
             ob.disabled=true;
-            var L='ABCD'[oi];
+            var L='ABCDEFGHIJKLMNOPQRSTUVWXYZ'[oi];
             if(item.a.indexOf(L)>=0) ob.classList.add('correct');
             if(__picked.indexOf(L)>=0&&item.a.indexOf(L)<0) ob.classList.add('wrong');
           });
