@@ -741,6 +741,11 @@ body.eng-exam-mode .q-text .qscore{color:var(--sub);font-size:13px;margin-right:
           <div class="name">西方文论选读</div>
           <div class="cnt">题海+思维导图+考前60分</div>
         </div>
+        <div class="subj" onclick="goSubject('14287')">
+          <div class="code">课程代码 14287</div>
+          <div class="name">唐诗宋词研究</div>
+          <div class="cnt">密训讲义+考前60分+高频考点</div>
+        </div>
       </div>
     </div>
   </div>
@@ -799,7 +804,7 @@ document.addEventListener('click',function(e){
 });
 function gsRun(q){
   var box=document.getElementById('gsearch-res'); if(!box) return;
-  var codes=['15043','11344','15044','15040','13000','11501','00536','00537','00538','00539','00540','00821','00037','00541','11346','00816','13426','10396','00815'];
+  var codes=['15043','11344','15044','15040','13000','11501','00536','00537','00538','00539','00540','00821','00037','00541','11346','00816','13426','10396','00815','14287'];
   var need=[];
   codes.forEach(function(c){ if(!(typeof DATA!=='undefined' && DATA[c])) need.push('data_'+c+'.js'); });
   if(need.length){
@@ -1405,7 +1410,7 @@ function buildSidebar(code){
   const coreBlanks=allBlanks.filter(function(k){ var v=s.blanks[k]; return v&&v.type!=='raw'&&k.indexOf('核心考点')>=0; });
   const blankCards=allBlanks.filter(function(k){ var v=s.blanks[k]; return v&&v.type!=='raw'&&k.indexOf('核心考点')<0&&k!=='万能答题模板'; });
   const hasTpl=!!((s.qa&&s.qa['万能答题模板'])||(s.blanks&&s.blanks["万能答题模板"]));
-  if(code==='15044'||code==='15040'||code==='11344'||code==='11501'||code==='00536'||code==='00537'||code==='00538'||code==='00539'||code==='00540'||code==='00821'||code==='00037'||code==='00541'||code==='11346'||code==='00816'||code==='13426'||code==='10396'||code==='00815'){ practiceQA.length=0; practiceRaw.length=0; practiceSets=[]; } // 马原/新思想练习类主观题已全部并入专项训练；11344 及 9 门汉语言课背诵资料只走主观题背诵（声明后再清空）；00816/13426/10396/00815 广东选修背诵资料同理只走主观题背诵
+  if(code==='15044'||code==='15040'||code==='11344'||code==='11501'||code==='00536'||code==='00537'||code==='00538'||code==='00539'||code==='00540'||code==='00821'||code==='00037'||code==='00541'||code==='11346'||code==='00816'||code==='13426'||code==='10396'||code==='00815'||code==='14287'){ practiceQA.length=0; practiceRaw.length=0; practiceSets=[]; } // 马原/新思想练习类主观题已全部并入专项训练；11344 及 9 门汉语言课背诵资料只走主观题背诵（声明后再清空）；00816/13426/10396/00815 广东选修背诵资料同理只走主观题背诵；14287 唐诗宋词研究无练习/真题套卷，背诵资料只走主观题背诵
   function esc(k){ return k.replace(/'/g,''); }
   function item(mod,ks,cls){
     var h='';
@@ -1856,7 +1861,7 @@ function showOverview(code){
     return true;
   });
   var practiceCount = practiceSets.length + practiceQA.length + practiceRaw.length;
-  if(code==='11344'||code==='11501'||code==='00536'||code==='00537'||code==='00538'||code==='00539'||code==='00540'||code==='00821'||code==='00037'||code==='00541'||code==='11346'||code==='00816'||code==='13426'||code==='10396'||code==='00815'){ practiceCount=0; } // 11344 及 9 门汉语言课无练习/刷题独立区，背诵资料统一走主观题背诵；00816/13426/10396/00815 广东选修同理
+  if(code==='11344'||code==='11501'||code==='00536'||code==='00537'||code==='00538'||code==='00539'||code==='00540'||code==='00821'||code==='00037'||code==='00541'||code==='11346'||code==='00816'||code==='13426'||code==='10396'||code==='00815'||code==='14287'){ practiceCount=0; } // 11344 及 9 门汉语言课无练习/刷题独立区，背诵资料统一走主观题背诵；00816/13426/10396/00815 广东选修同理；14287 唐诗宋词研究同理
   var sprintPractice=[];
   practiceQA.forEach(function(k){ if(k!=='主观题汇总密训'&&k!=='决胜3小时') sprintPractice.push(k); });
   practiceRaw.forEach(function(k){ if(!practiceSkillSrc[k]&&k!=='重点词汇默写') sprintPractice.push(k); });
@@ -1868,8 +1873,8 @@ function showOverview(code){
   let html='<div style="font-size:18px;font-weight:700">'+s.name+'</div>';
   html+='<div class="mod-grid">';
   
-  // Always show all 6 cards, even if 0 count
-  html+='<div class="mod" onclick="showSets(\''+code+'\')"><div class="icon">📝</div><div class="name">历年真题</div><div class="cnt">'+yearSets.length+' 套</div></div>';
+  // Always show cards; hide 历年真题 card when the subject has no sets at all (e.g. 14287 无真题套卷)
+  if(Object.keys(s.sets||{}).length>0){ html+='<div class="mod" onclick="showSets(\''+code+'\')"><div class="icon">📝</div><div class="name">历年真题</div><div class="cnt">'+yearSets.length+' 套</div></div>'; }
   if(code==='15043'){ html+='<div class="mod" onclick="showZxHome(\''+code+'\')"><div class="icon">🎯</div><div class="name">专项训练</div><div class="cnt">5 题型 · 按真实卷分类</div></div>'; }
   if(code==='15044'){ html+='<div class="mod" onclick="showZxHome(\''+code+'\')"><div class="icon">🎯</div><div class="name">专项训练</div><div class="cnt">3 题型 · 单选/简答/论述</div></div>'; }
   if(code==='15040'){ html+='<div class="mod" onclick="showZxHome(\''+code+'\')"><div class="icon">🎯</div><div class="name">专项训练</div><div class="cnt">3 题型 · 单选/简答/论述</div></div>'; }
