@@ -6025,8 +6025,16 @@ function showRawBlanks(code,k){
   html+=resumeBar(code,'rawbk',k,"resumeJumpRaw('"+code+"','"+k+"',__N__)",v.title||k,null,'上次浏览位置 __N__%');
   if(code==='13000' && isWordTableContent(v.content||'')){
     html+=renderWordTable(v.content||'');
+  } else if(v.content){
+    html+='<div style="white-space:pre-wrap;line-height:1.9;font-size:15px;padding:10px 4px">'+escHtml(v.content)+'</div>';
+  } else if(Array.isArray(v.sections)&&v.sections.length){
+    for(var _i=0;_i<v.sections.length;_i++){
+      var _sec=v.sections[_i]||{};
+      html+='<div style="font-size:16px;font-weight:bold;color:#b5482e;margin:14px 0 6px">'+escHtml(_sec.h||'')+'</div>';
+      html+='<div style="white-space:pre-wrap;line-height:1.9;font-size:15px;padding:10px 4px">'+escHtml(_sec.c||'')+'</div>';
+    }
   } else {
-    html+='<div style="white-space:pre-wrap;line-height:1.9;font-size:15px;padding:10px 4px">'+escHtml(v.content||'')+'</div>';
+    html+='<div style="padding:10px 4px;color:#888">（该资料暂无内容）</div>';
   }
   document.getElementById('main-content').innerHTML=html;
   window.bindScrollSave(code,'rawbk',k,v.title||k);
