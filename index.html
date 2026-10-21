@@ -9660,7 +9660,7 @@ function renderQuizToMain(exam, onlyType, backExpr){
   var __zxFmZx=/showZxType/.test(backExpr||'');
   var __rmod=__zxFmZx?'zx':'sets';
   var __rjump=(__zxFmZx&&window.__zxCtx)?("resumeJumpZx('"+curSubj+"','"+window.__zxCtx.type+"','"+curSet+"','"+window.__zxCtx.kind+"',__N__)"):("resumeJumpQuiz('"+curSubj+"','"+curSet+"',__N__)");
-  box.innerHTML='<span class="back2" onclick="'+(backExpr||'backToSubject()')+'">← 返回</span>'+resumeBar(curSubj,__rmod,curSet,__rjump,curSet);
+  box.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin:4px 0 14px"><span class="back2" style="margin:0" onclick="'+(backExpr||'backToSubject()')+'">← 返回</span>'+resumeBar(curSubj,__rmod,curSet,__rjump,curSet)+'<button class="action-btn" style="margin-left:auto;padding:4px 10px;font-size:12.5px" title="清空本套作答记录，重新做题" onclick="redoQuiz()">↺ 重做</button></div>';
   if(exam.sections){ renderSections(exam.sections,box); return; }
   let qno=0;
   const choiceQues=[];
@@ -9746,6 +9746,29 @@ function renderQuizToMain(exam, onlyType, backExpr){
   window.__examQues=choiceQues;
   if(/黄金卷|模拟试卷|预测|押题/.test(curSet||'')){ startExamTimer(box); }
   window.__zr=function(){ if(backExpr){ try{ eval(backExpr); }catch(_e){} } else { startQuiz(curSubj,curSet); } };
+}
+
+/* 真题重做：清空本套作答记录 + 限时计时条 + 进度记录，重新做题 */
+function redoQuiz(){
+  var ansKey='zikao_exam_ans_'+curSubj+'__'+curSet;
+  var answered=0;
+  try{ answered=Object.keys(JSON.parse(localStorage.getItem(ansKey)||'{}')).length; }catch(e){}
+  var msg=answered>0?('本套已答 '+answered+' 题，确定清空作答记录并重新做题吗？'):'确定重新做题吗？';
+  if(!confirm(msg)) return;
+  var mask=document.getElementById('exam-mask'); if(mask) mask.remove();
+  if(window.__examTimer){ clearInterval(window.__examTimer); window.__examTimer=null; }
+  try{ localStorage.removeItem(ansKey); }catch(e){}
+  try{
+    var rs=JSON.parse(localStorage.getItem(RESUME_KEY)||'{}');
+    var hit=false;
+    ['sets','zx'].forEach(function(m){
+      var k=curSubj+'|'+m+'|'+curSet;
+      if(rs[k]){ delete rs[k]; hit=true; }
+    });
+    if(hit) localStorage.setItem(RESUME_KEY,JSON.stringify(rs));
+  }catch(e){}
+  window.scrollTo(0,0);
+  startQuiz(curSubj,curSet);
 }
 
 function renderSections(sections,box){
