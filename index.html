@@ -1518,6 +1518,9 @@ function buildSidebar(code){
   if(yearSets.length>0){
     html+='<div class="nav-item" data-mod="pred" onclick="setActive(\'pred\');showPred(\''+code+'\')">🔮 真题预测</div>';
   }
+  if(['15043','15044','15040'].indexOf(code)>=0){
+    html+='<div class="nav-item" data-mod="tips" onclick="setActive(\'tips\');showTips(\''+code+'\')">💡 万能答题技巧</div>';
+  }
   if(yearSets.length>0){
     html+='<div class="nav-item nav-sec" data-mod="sets" onclick="toggleNavSec(\'sets\');showSets(\''+code+'\')"><span class="nav-toggle">▶</span>📝 历年真题</div>'+sub('sets',yearSets);
   }
@@ -9840,6 +9843,112 @@ function buildPredPaper(code){
     h+='<div style="margin:6px 0 0 20px;padding:8px 12px;background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;font-size:13.5px;line-height:1.8;color:#234">【参考答案】'+escHtml(item.a||'')+'</div></div>';
   });
   h+='<div style="font-size:12px;color:#aaa;margin:20px 0 6px">说明：本卷由系统从「真题预测」按考点概率排序抽题（高概率主题优先），题目为参考真题风格拟写的模拟题，非官方真题；简答/论述为要点式参考答案，考试时请结合分值适当展开。</div>';
+  box.innerHTML=h;
+  window.scrollTo(0,0);
+}
+
+/* ===== 考前万能答题技巧（明天上场直接套） ===== */
+function showTips(code){
+  setActive('tips');
+  var s=DATA[code]||{name:''};
+  var tbt=document.getElementById('tb-crumb'); if(tbt) tbt.textContent='首页 / '+s.name+' / 万能答题技巧';
+  var tbt2=document.getElementById('tb-title'); if(tbt2) tbt2.textContent=s.name+' · 万能答题技巧';
+  var box=document.getElementById('main-content');
+  var h='';
+  h+='<div style="font-size:19px;font-weight:700;margin:8px 0 2px">💡 考前万能答题技巧</div>';
+  h+='<div style="font-size:13px;color:#888;margin-bottom:14px">明天上场直接套 · 每类技巧配最可能考的示范案例</div>';
+
+  // ===== 一、选择题 =====
+  h+='<div style="font-size:16px;font-weight:700;color:#b5482e;margin:16px 0 8px">一、选择题（每题2分，4选1）</div>';
+  h+='<div style="background:#fff;border:1px solid #e6e9ef;border-radius:8px;padding:12px 14px;margin:8px 0">';
+  h+='<div style="font-size:14.5px;font-weight:700;margin-bottom:6px">4条铁律</div>';
+  h+='<div style="font-size:13.5px;line-height:1.9;color:#333">';
+  h+='① <b>排除法优先于正选法</b>——先把明显错的划掉，剩下的再比。<br>';
+  h+='② <b>绝对化词大概率错</b>：选项里出现"完全""一切""彻底""唯一""始终"（领导人原话除外），直接排。<br>';
+  h+='③ <b>褒贬不一致排</b>：题干问"意义/成就"，选项带"局限/失败/教训"的排。<br>';
+  h+='④ <b>马原特别注意</b>：选项本身表述正确 ≠ 是答案，还要看它<b>对应题干问的范畴</b>（题干问"唯物论"，选项讲"辩证法"再对也不选）。';
+  h+='</div></div>';
+
+  // 选择题案例
+  h+='<div style="font-size:14px;font-weight:700;color:#0a7d33;margin:10px 0 4px">📌 示范案例（最可能考）</div>';
+  if(code==='15043'){
+    h+='<div style="background:#fffbe6;border-left:3px solid #e6a23c;border-radius:4px;padding:10px 12px;margin:6px 0;font-size:13.5px;line-height:1.8"><b>案例：</b>标志着中国共产党从幼年走向成熟的会议是？<br>A.八七会议　B.遵义会议　C.中共七大　D.七届二中全会<br><span style="color:#1e8449;font-weight:600">→ 选 B。</span>用时间线排：八七(1927.8)=大革命失败后定方针；遵义(1935)=长征途中纠正左倾；七大(1945)=确立毛泽东思想；七届二中(1949)=进京赶考。"从幼年走向成熟"= 纠正自身错误 = 遵义。</div>';
+    h+='<div style="background:#fffbe6;border-left:3px solid #e6a23c;border-radius:4px;padding:10px 12px;margin:6px 0;font-size:13.5px;line-height:1.8"><b>案例：</b>中国近代史上第一个资产阶级革命团体是？<br>A.兴中会　B.华兴会　C.同盟会　D.光复会<br><span style="color:#1e8449;font-weight:600">→ 选 A。</span>关键词"第一个"：兴中会(1894)是团体；同盟会(1905)是第一个<b>全国性政党</b>。题干说"团体"=兴中会，说"政党"=同盟会。</div>';
+  }else if(code==='15044'){
+    h+='<div style="background:#fffbe6;border-left:3px solid #e6a23c;border-radius:4px;padding:10px 12px;margin:6px 0;font-size:13.5px;line-height:1.8"><b>案例：</b>"巧妇难为无米之炊"这句话强调了？<br>A.意识的能动作用　B.物质决定意识　C.要尊重客观规律　D.要发挥主观能动性<br><span style="color:#1e8449;font-weight:600">→ 选 B。</span>这道题陷阱在C、D——四句都对，但"无米"= 没有物质条件 = 物质决定意识。<b>选项本身对≠是答案，看题干关键词。</b></div>';
+    h+='<div style="background:#fffbe6;border-left:3px solid #e6a23c;border-radius:4px;padding:10px 12px;margin:6px 0;font-size:13.5px;line-height:1.8"><b>案例：</b>矛盾的基本属性是？<br>A.普遍性和特殊性　B.对抗性和非对抗性　C.同一性和斗争性　D.主要和次要<br><span style="color:#1e8449;font-weight:600">→ 选 C。</span>陷阱在A——普遍性/特殊性是"矛盾问题的精髓"，不是"基本属性"。教材固定搭配，死记。</div>';
+  }else{
+    h+='<div style="background:#fffbe6;border-left:3px solid #e6a23c;border-radius:4px;padding:10px 12px;margin:6px 0;font-size:13.5px;line-height:1.8"><b>案例：</b>新发展理念中，引领发展的第一动力是？<br>A.协调　B.绿色　C.创新　D.开放<br><span style="color:#1e8449;font-weight:600">→ 选 C。</span>固定搭配：创新=第一动力；协调=内生特点；绿色=普遍形态；开放=必由之路；共享=根本目的。</div>';
+    h+='<div style="background:#fffbe6;border-left:3px solid #e6a23c;border-radius:4px;padding:10px 12px;margin:6px 0;font-size:13.5px;line-height:1.8"><b>案例：</b>中国特色社会主义最本质的特征是？<br>A.人民当家作主　B.中国共产党领导　C.共同富裕　D.公有制为主体<br><span style="color:#1e8449;font-weight:600">→ 选 B。</span>"最本质特征/最大优势/最高领导力量"全 = 党领导。看到"最本质/核心/根本"直接对应党。</div>';
+  }
+
+  // ===== 二、简答题 =====
+  h+='<div style="font-size:16px;font-weight:700;color:#b5482e;margin:20px 0 8px">二、简答题（每题6~7分）</div>';
+  h+='<div style="background:#fff;border:1px solid #e6e9ef;border-radius:8px;padding:12px 14px;margin:8px 0">';
+  h+='<div style="font-size:14.5px;font-weight:700;margin-bottom:6px">铁律：分点①②③标号，每点一句话+半句解释</div>';
+  h+='<div style="font-size:13.5px;line-height:1.9;color:#333">阅卷按点给分，写一大段糊在一起=0分。万能骨架：</div>';
+  h+='<table style="width:100%;font-size:13px;border-collapse:collapse;margin-top:6px">';
+  h+='<tr style="background:#f5f7fa"><td style="border:1px solid #e0e4ea;padding:5px 8px;font-weight:600">题干问</td><td style="border:1px solid #e0e4ea;padding:5px 8px;font-weight:600">模板</td></tr>';
+  h+='<tr><td style="border:1px solid #e0e4ea;padding:5px 8px">"意义/作用"</td><td style="border:1px solid #e0e4ea;padding:5px 8px">①性质/地位 ②对当时影响 ③对今天启示</td></tr>';
+  h+='<tr><td style="border:1px solid #e0e4ea;padding:5px 8px">"原因/背景"</td><td style="border:1px solid #e0e4ea;padding:5px 8px">①客观条件 ②主观条件 ③直接导火索</td></tr>';
+  h+='<tr><td style="border:1px solid #e0e4ea;padding:5px 8px">"内容/内涵"</td><td style="border:1px solid #e0e4ea;padding:5px 8px">直接分3~4点列，每点用教材原词开头</td></tr>';
+  h+='<tr><td style="border:1px solid #e0e4ea;padding:5px 8px">"关系"</td><td style="border:1px solid #e0e4ea;padding:5px 8px">A是什么、B是什么、二者辩证统一</td></tr>';
+  h+='</table></div>';
+
+  // 简答题案例
+  h+='<div style="font-size:14px;font-weight:700;color:#0a7d33;margin:10px 0 4px">📌 示范答案（最可能考）</div>';
+  if(code==='15043'){
+    h+='<div style="background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;padding:10px 12px;margin:6px 0;font-size:13.5px;line-height:1.8"><b>简述遵义会议的历史意义（6分）</b><br>① 集中解决了军事问题和组织问题，结束了王明"左"倾教条主义在中央的统治；<br>② 确立了毛泽东在党和红军中的领导地位；<br>③ 在最危急的关头挽救了党、挽救了红军、挽救了中国革命；<br>④ 是中国共产党从幼年走向成熟的标志。</div>';
+    h+='<div style="background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;padding:10px 12px;margin:6px 0;font-size:13.5px;line-height:1.8"><b>简述党的十一届三中全会的历史意义（6分）</b><br>① 重新确立了解放思想、实事求是的思想路线；<br>② 果断停止使用"以阶级斗争为纲"的口号，作出把工作重心转移到经济建设上来的决策；<br>③ 作出实行改革开放的历史性决策；<br>④ 是新中国成立以来党的历史上具有深远意义的伟大转折。</div>';
+  }else if(code==='15044'){
+    h+='<div style="background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;padding:10px 12px;margin:6px 0;font-size:13.5px;line-height:1.8"><b>简述实践和认识的辩证关系（6分）</b><br>① 实践决定认识：实践是认识的来源、动力、检验标准和目的；<br>② 认识对实践具有能动反作用：正确认识促进实践，错误认识阻碍实践；<br>③ 这一原理要求我们坚持实践第一的观点，又重视科学理论的指导作用。</div>';
+    h+='<div style="background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;padding:10px 12px;margin:6px 0;font-size:13.5px;line-height:1.8"><b>简述生产力和生产关系的辩证关系（6分）</b><br>① 生产力决定生产关系：生产力的性质决定生产关系的性质，生产力的发展决定生产关系的变革；<br>② 生产关系反作用于生产力：适合生产力的生产关系促进其发展，不适合的阻碍其发展；<br>③ 这一规律是马克思主义政党制定路线方针政策的客观依据。</div>';
+  }else{
+    h+='<div style="background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;padding:10px 12px;margin:6px 0;font-size:13.5px;line-height:1.8"><b>简述中国式现代化的五个中国特色（7分）</b><br>① 是人口规模巨大的现代化；<br>② 是全体人民共同富裕的现代化；<br>③ 是物质文明和精神文明相协调的现代化；<br>④ 是人与自然和谐共生的现代化；<br>⑤ 是走和平发展道路的现代化。</div>';
+    h+='<div style="background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;padding:10px 12px;margin:6px 0;font-size:13.5px;line-height:1.8"><b>简述全过程人民民主的本质和特征（7分）</b><br>① 本质是人民当家作主；<br>② 是全过程的民主：民主选举、协商、决策、管理、监督各环节都贯穿人民参与；<br>③ 是最广泛、最真实、最管用的民主；<br>④ 是社会主义民主政治的本质属性，具有区别于西方民主的显著优势。</div>';
+  }
+
+  // ===== 三、论述/材料题 =====
+  h+='<div style="font-size:16px;font-weight:700;color:#b5482e;margin:20px 0 8px">三、论述题 / 材料题（10~15分）</div>';
+  h+='<div style="background:#fff;border:1px solid #e6e9ef;border-radius:8px;padding:12px 14px;margin:8px 0">';
+  h+='<div style="font-size:14.5px;font-weight:700;margin-bottom:6px">万能三段论，所有题都能套</div>';
+  h+='<div style="font-size:13.5px;line-height:1.9;color:#333">';
+  h+='<b>第一段（是什么，3分）</b>：把核心概念用教材原话定义一遍，抄题干关键词。<br>';
+  h+='<b>第二段（为什么/是什么内容，5~7分）</b>：分①②③展开，每点=原理/事件+一句解释。<b>宁多写勿少写</b>。<br>';
+  h+='<b>第三段（意义/启示，2~3分）</b>：套话收尾——"对新时代坚持和发展中国特色社会主义、实现中华民族伟大复兴的中国梦具有重大指导意义"。<br>';
+  if(code==='15044'){
+    h+='<br><b style="color:#c0392b">马原特别注意</b>：必须先写<b>哲学原理名称</b>（如"矛盾普遍性和特殊性辩证关系原理"），再写方法论，最后"结合材料……"。只结合材料不写原理=一半分。';
+  }
+  if(code==='15040'){
+    h+='<br><b style="color:#c0392b">材料题（15分）特别注意</b>：每个分点开头<b>抄一遍材料里的原词</b>，让老师看到你"结合了材料"，只写原理不给满分。';
+  }
+  h+='</div></div>';
+
+  // 论述案例
+  h+='<div style="font-size:14px;font-weight:700;color:#0a7d33;margin:10px 0 4px">📌 示范答案（最可能考）</div>';
+  if(code==='15043'){
+    h+='<div style="background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;padding:10px 12px;margin:6px 0;font-size:13.5px;line-height:1.8"><b>试述辛亥革命的伟大历史意义（10分）</b><br><span style="color:#888">【是什么】</span>辛亥革命是中国人民为救亡图存、振兴中华而奋起革命的里程碑。<br><span style="color:#888">【为什么/内容】</span>① 推翻了清王朝的统治，结束了中国两千多年的君主专制制度；② 建立了中国历史上第一个资产阶级共和国，颁布了《临时约法》；③ 使民主共和的观念深入人心；④ 促进了民族资本主义的发展和人们思想的解放。<br><span style="color:#888">【意义/启示】</span>它是中国人民为救亡图存而奋起革命的里程碑，为后来中国人民的革命斗争开辟了道路，对中国社会的进步具有重大而深远的意义。</div>';
+    h+='<div style="background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;padding:10px 12px;margin:6px 0;font-size:13.5px;line-height:1.8"><b>试述中国共产党成立的历史意义（10分）</b><br><span style="color:#888">【是什么】</span>中国共产党的成立是"开天辟地的大事变"。<br><span style="color:#888">【为什么/内容】</span>① 中国革命从此有了坚强的领导核心；② 有了科学的指导思想——马克思主义；③ 有了新的革命方法，即发动和依靠人民群众；④ 深刻改变了近代以后中华民族发展的方向和进程、中国人民和中华民族的前途和命运、世界发展的趋势和格局。<br><span style="color:#888">【意义/启示】</span>自从有了中国共产党，中国革命的面貌就焕然一新了。</div>';
+  }else if(code==='15044'){
+    h+='<div style="background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;padding:10px 12px;margin:6px 0;font-size:13.5px;line-height:1.8"><b>试述矛盾普遍性和特殊性的辩证关系原理及其现实意义（10分）</b><br><span style="color:#888">【原理】</span>① 矛盾的普遍性即矛盾无处不在、无时不有；矛盾的特殊性是指具体事物所包含的矛盾及每一矛盾的各个方面都有其特点；② 二者是辩证统一的：普遍性寓于特殊性之中，并通过特殊性表现出来；特殊性包含普遍性；二者在一定条件下相互转化。<br><span style="color:#888">【方法论】</span>这一原理是马克思主义普遍真理同各国具体实际相结合的哲学基础，要求我们坚持一般与个别相结合。<br><span style="color:#888">【结合实际】</span>建设中国特色社会主义，就是把马克思主义基本原理同中国具体实际相结合、同中华优秀传统文化相结合，体现了矛盾普遍性与特殊性的统一。</div>';
+  }else{
+    h+='<div style="background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;padding:10px 12px;margin:6px 0;font-size:13.5px;line-height:1.8"><b>材料分析：试述新发展理念的内涵和意义（15分）</b><br><span style="color:#888">【是什么】</span>新发展理念是创新、协调、绿色、开放、共享的发展理念。<br><span style="color:#888">【为什么/内容】</span>① 创新是引领发展的第一动力，解决发展动力问题；② 协调是内生特点，解决发展不平衡问题；③ 绿色是普遍形态，解决人与自然和谐共生问题；④ 开放是必由之路，解决发展内外联动问题；⑤ 共享是根本目的，解决社会公平正义问题。<br><span style="color:#888">【意义】</span>新发展理念是引领我国经济社会发展的指挥棒、红绿灯，对于推动高质量发展、构建新发展格局、实现中国式现代化具有重大指导意义。<br><span style="color:#888">（答题时每个分点开头要抄一遍材料里出现的关键词，证明"结合了材料"）</span></div>';
+  }
+
+  // ===== 四、临场救急 =====
+  h+='<div style="font-size:16px;font-weight:700;color:#b5482e;margin:20px 0 8px">四、临场救急（写满就有分）</div>';
+  h+='<div style="background:#fff;border:1px solid #e6e9ef;border-radius:8px;padding:12px 14px;margin:8px 0;font-size:13.5px;line-height:1.9;color:#333">';
+  h+='① <b>字数</b>：简答写满答题纸1/3页，论述写2/3页以上。空着=0，写满=保底40%分。<br>';
+  h+='② <b>不会就相关写</b>：题干问"遵义会议"，想不起具体意义，就把"长征""党的成熟""毛泽东领导"这些相关词全写上，沾边就给分。<br>';
+  h+='③ <b>分点标号一定要显眼</b>：①②③ 写清楚，比字漂亮更重要。<br>';
+  if(code==='15040'){
+    h+='④ <b>最后那道15分材料题留20分钟以上</b>，这一题分值最高，写不完最亏。';
+  }else{
+    h+='④ <b>最后一道10分论述题留15分钟以上</b>，写满三段论。';
+  }
+  h+='</div>';
+
+  h+='<div style="font-size:12px;color:#aaa;margin:20px 0 6px">祝你明天顺利。这套技巧是通用答题框架，具体知识点请结合「🔮 真题预测」里的高频考点一起背。</div>';
   box.innerHTML=h;
   window.scrollTo(0,0);
 }
