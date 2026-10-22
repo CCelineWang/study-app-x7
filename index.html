@@ -1633,6 +1633,7 @@ function showPred(code){
   var predQOpen={}; try{ predQOpen=JSON.parse(localStorage.getItem('zikao_pred_qopen_'+code)||'{}'); }catch(e){}
   var h='';
   h+='<div style="font-size:18px;font-weight:700;margin:4px 0 6px">🔮 真题预测</div>';
+  h+='<div style="margin:6px 0 10px"><button class="action-btn" style="background:#b5482e;color:#fff;border-color:#b5482e;padding:6px 12px" onclick="buildPredPaper(\''+code+'\')">📄 生成考前押题模拟卷（按真题排版 · 附答案）</button></div>';
   h+='<div style="font-size:13px;color:#888;margin-bottom:10px">'+(P.meta||'')+'</div>';
   if(P.heat&&P.heat.length){
     h+='<div style="font-size:14px;font-weight:700;color:#0a7d33;margin:12px 0 6px">📊 出题热度总览</div>';
@@ -9769,6 +9770,78 @@ function redoQuiz(){
   }catch(e){}
   window.scrollTo(0,0);
   startQuiz(curSubj,curSet);
+}
+
+/* ===== 真题预测 → 动态组卷：按概率排序抽题，排成真题卷样式并附答案 ===== */
+function buildPredPaper(code){
+  var P=PRED[code]||{groups:[]};
+  var s=DATA[code];
+  var pool=[];
+  (P.groups||[]).forEach(function(g){
+    (g.items||[]).forEach(function(it){
+      var tier=it.tier||1;
+      (it.q||[]).forEach(function(q){
+        pool.push({t:q.t,q:q.q,o:q.o,a:q.a,tier:tier,topic:it.topic||''});
+      });
+    });
+  });
+  var singles=pool.filter(function(x){return x.t==='单选';});
+  var shorts=pool.filter(function(x){return x.t==='简答';});
+  var essays=pool.filter(function(x){return x.t==='论述';});
+  if(singles.length<10){
+    alert('本科目预测数据以题型规律/作文主题为主，不适合按卷面组卷，请在下方直接展开考点背诵。');
+    return;
+  }
+  // 按考点(topic)轮询抽题：模拟真实真题"每个高频考点只出1-2题"的分布，避免同主题扎堆
+  function roundRobin(list, need, maxPerTopic){
+    var byTopic={};
+    list.forEach(function(x){
+      var k=x.topic||('__q'+Math.random());
+      if(!byTopic[k]) byTopic[k]={tier:x.tier, qs:[]};
+      byTopic[k].qs.push(x);
+    });
+    var tlist=Object.values(byTopic).sort(function(a,b){return b.tier-a.tier;});
+    var out=[];
+    for(var r=0;r<maxPerTopic && out.length<need;r++){
+      for(var i=0;i<tlist.length && out.length<need;i++){
+        if(tlist[i].qs[r]) out.push(tlist[i].qs[r]);
+      }
+    }
+    return out;
+  }
+  var cfg={
+    '15043':{cn:25,cs:2,sn:5,ss:6,en:3,es:10,ehead:'三、论述题'},
+    '15044':{cn:25,cs:2,sn:5,ss:6,en:3,es:10,ehead:'三、论述题'},
+    '15040':{cn:25,cs:2,sn:5,ss:7,en:1,es:15,ehead:'三、材料分析题'}
+  }[code]||{cn:25,cs:2,sn:5,ss:6,en:3,es:10,ehead:'三、论述题'};
+  var ch=roundRobin(singles,cfg.cn,2);   // 单选每考点最多2题
+  var sh=roundRobin(shorts,cfg.sn,1);   // 简答每考点最多1题
+  var es=roundRobin(essays,cfg.en,1);   // 论述每考点最多1题
+  var box=document.getElementById('main-content');
+  var h='';
+  h+='<div style="margin-bottom:6px"><button class="action-btn" onclick="showPred(\''+code+'\')">← 返回预测板块</button></div>';
+  h+='<div style="font-size:19px;font-weight:700;text-align:center;margin:10px 0 2px">'+escHtml(s.name)+'</div>';
+  h+='<div style="font-size:16px;font-weight:700;text-align:center;margin-bottom:4px">2610 考前预测押题卷</div>';
+  h+='<div style="font-size:12.5px;color:#888;text-align:center;margin-bottom:14px">由系统从「真题预测」高频考点按出题概率排序抽取 · 参考真题题型排版 · 附参考答案</div>';
+  h+='<div style="font-size:15px;font-weight:700;margin:14px 0 6px">一、单项选择题（本大题共 '+ch.length+' 小题，每小题 '+cfg.cs+' 分，共 '+(ch.length*cfg.cs)+' 分）</div>';
+  ch.forEach(function(item,i){
+    h+='<div style="margin:10px 0;font-size:14.5px;line-height:1.7"><div>'+(i+1)+'. '+escHtml(item.q)+' <span style="color:#999;font-size:12px">（'+cfg.cs+'分）</span></div>';
+    (item.o||[]).forEach(function(op){ h+='<div style="padding-left:20px;color:#333">'+escHtml(op)+'</div>'; });
+    h+='<div style="margin:4px 0 0 20px;font-size:13px;color:#1e8449;font-weight:600">【参考答案】'+escHtml(item.a||'')+'</div></div>';
+  });
+  h+='<div style="font-size:15px;font-weight:700;margin:18px 0 6px">二、简答题（本大题共 '+sh.length+' 小题，每小题 '+cfg.ss+' 分，共 '+(sh.length*cfg.ss)+' 分）</div>';
+  sh.forEach(function(item,i){
+    h+='<div style="margin:12px 0"><div style="font-size:14.5px;font-weight:600;line-height:1.7">'+(cfg.cn+i+1)+'. '+escHtml(item.q)+' <span style="color:#999;font-size:12px">（'+cfg.ss+'分）</span></div>';
+    h+='<div style="margin:6px 0 0 20px;padding:8px 12px;background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;font-size:13.5px;line-height:1.8;color:#234">【参考答案】'+escHtml(item.a||'')+'</div></div>';
+  });
+  h+='<div style="font-size:15px;font-weight:700;margin:18px 0 6px">'+cfg.ehead+'（本大题共 '+es.length+' 小题，每小题 '+cfg.es+' 分，共 '+(es.length*cfg.es)+' 分）</div>';
+  es.forEach(function(item,i){
+    h+='<div style="margin:12px 0"><div style="font-size:14.5px;font-weight:600;line-height:1.7">'+(cfg.cn+cfg.sn+i+1)+'. '+escHtml(item.q)+' <span style="color:#999;font-size:12px">（'+cfg.es+'分）</span></div>';
+    h+='<div style="margin:6px 0 0 20px;padding:8px 12px;background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;font-size:13.5px;line-height:1.8;color:#234">【参考答案】'+escHtml(item.a||'')+'</div></div>';
+  });
+  h+='<div style="font-size:12px;color:#aaa;margin:20px 0 6px">说明：本卷由系统从「真题预测」按考点概率排序抽题（高概率主题优先），题目为参考真题风格拟写的模拟题，非官方真题；简答/论述为要点式参考答案，考试时请结合分值适当展开。</div>';
+  box.innerHTML=h;
+  window.scrollTo(0,0);
 }
 
 function renderSections(sections,box){
