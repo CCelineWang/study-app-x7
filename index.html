@@ -9838,25 +9838,75 @@ function buildPredPaper(code){
   h+='<div style="font-size:19px;font-weight:700;text-align:center;margin:10px 0 2px">'+escHtml(s.name)+'</div>';
   h+='<div style="font-size:16px;font-weight:700;text-align:center;margin-bottom:4px">2610 考前预测押题卷</div>';
   h+='<div style="font-size:12.5px;color:#888;text-align:center;margin-bottom:14px">由系统从「真题预测」高频考点按出题概率排序抽取 · 参考真题题型排版 · 附参考答案</div>';
+  window.__predPaperChAns = []; // 存每题正确答案字母
   h+='<div style="font-size:15px;font-weight:700;margin:14px 0 6px">一、单项选择题（本大题共 '+ch.length+' 小题，每小题 '+cfg.cs+' 分，共 '+(ch.length*cfg.cs)+' 分）</div>';
   ch.forEach(function(item,i){
-    h+='<div style="margin:10px 0;font-size:14.5px;line-height:1.7"><div>'+(i+1)+'. '+escHtml(item.q)+' <span style="color:#999;font-size:12px">（'+cfg.cs+'分）</span></div>';
-    (item.o||[]).forEach(function(op){ h+='<div style="padding-left:20px;color:#333">'+escHtml(op)+'</div>'; });
-    h+='<div style="margin:4px 0 0 20px;font-size:13px;color:#1e8449;font-weight:600">【参考答案】'+escHtml(item.a||'')+'</div></div>';
+    var correctLetter = String(item.a||'').trim().charAt(0).toUpperCase();
+    window.__predPaperChAns.push(correctLetter);
+    var qid='predch-'+i;
+    h+='<div style="margin:12px 0" id="'+qid+'">'
+      +'<div style="font-size:14.5px;line-height:1.7">'+(i+1)+'. '+escHtml(item.q)+' <span style="color:#999;font-size:12px">（'+cfg.cs+'分）</span></div>'
+      +'<div class="opts" style="margin-top:8px">';
+    (item.o||[]).forEach(function(op,oi){
+      var lab='ABCDEFGHIJKLMNOPQRSTUVWXYZ'[oi];
+      h+='<button class="opt" onclick="predPickCh(this,\''+qid+'\','+i+',\''+lab+'\')" style="margin-bottom:6px"><span class="lab">'+lab+'</span><span>'+escHtml(op)+'</span></button>';
+    });
+    h+='</div>'
+      +'<div class="ans-box" style="display:none;margin-top:6px"></div>'
+      +'</div>';
   });
+  // 选择题得分统计
+  h+='<div id="predScore" style="margin:14px 0;padding:10px 14px;background:#f0f4f8;border-radius:8px;font-size:14px;color:#333">选择题得分：<b id="predScoreNum">0</b> / '+ch.length+' · 每题选一项</div>';
+
   h+='<div style="font-size:15px;font-weight:700;margin:18px 0 6px">二、简答题（本大题共 '+sh.length+' 小题，每小题 '+cfg.ss+' 分，共 '+(sh.length*cfg.ss)+' 分）</div>';
   sh.forEach(function(item,i){
-    h+='<div style="margin:12px 0"><div style="font-size:14.5px;font-weight:600;line-height:1.7">'+(cfg.cn+i+1)+'. '+escHtml(item.q)+' <span style="color:#999;font-size:12px">（'+cfg.ss+'分）</span></div>';
-    h+='<div style="margin:6px 0 0 20px;padding:8px 12px;background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;font-size:13.5px;line-height:1.8;color:#234">【参考答案】'+escHtml(item.a||'')+'</div></div>';
+    var sid='predsh-'+i;
+    h+='<div style="margin:12px 0"><div style="font-size:14.5px;font-weight:600;line-height:1.7">'+(cfg.cn+i+1)+'. '+escHtml(item.q)+' <span style="color:#999;font-size:12px">（'+cfg.ss+'分）</span></div>'
+      +'<button onclick="togglePredAns(this,\''+sid+'\')" style="margin:6px 0 0 20px;background:#eef2f7;border:1px solid #d8dfe8;border-radius:6px;font-size:12.5px;color:#333;padding:4px 12px;cursor:pointer">✏ 先自己写，写完点看答案</button>'
+      +'<div id="'+sid+'" style="display:none;margin:6px 0 0 20px;padding:8px 12px;background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;font-size:13.5px;line-height:1.8;color:#234">'+escHtml(item.a||'')+'</div></div>';
   });
   h+='<div style="font-size:15px;font-weight:700;margin:18px 0 6px">'+cfg.ehead+'（本大题共 '+es.length+' 小题，每小题 '+cfg.es+' 分，共 '+(es.length*cfg.es)+' 分）</div>';
   es.forEach(function(item,i){
-    h+='<div style="margin:12px 0"><div style="font-size:14.5px;font-weight:600;line-height:1.7">'+(cfg.cn+cfg.sn+i+1)+'. '+escHtml(item.q)+' <span style="color:#999;font-size:12px">（'+cfg.es+'分）</span></div>';
-    h+='<div style="margin:6px 0 0 20px;padding:8px 12px;background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;font-size:13.5px;line-height:1.8;color:#234">【参考答案】'+escHtml(item.a||'')+'</div></div>';
+    var eid='predes-'+i;
+    h+='<div style="margin:12px 0"><div style="font-size:14.5px;font-weight:600;line-height:1.7">'+(cfg.cn+cfg.sn+i+1)+'. '+escHtml(item.q)+' <span style="color:#999;font-size:12px">（'+cfg.es+'分）</span></div>'
+      +'<button onclick="togglePredAns(this,\''+eid+'\')" style="margin:6px 0 0 20px;background:#eef2f7;border:1px solid #d8dfe8;border-radius:6px;font-size:12.5px;color:#333;padding:4px 12px;cursor:pointer">✏ 先自己写，写完点看答案</button>'
+      +'<div id="'+eid+'" style="display:none;margin:6px 0 0 20px;padding:8px 12px;background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;font-size:13.5px;line-height:1.8;color:#234">'+escHtml(item.a||'')+'</div></div>';
   });
   h+='<div style="font-size:12px;color:#aaa;margin:20px 0 6px">说明：本卷由系统从「真题预测」按考点概率排序抽题（高概率主题优先），题目为参考真题风格拟写的模拟题，非官方真题；简答/论述为要点式参考答案，考试时请结合分值适当展开。</div>';
   box.innerHTML=h;
   window.scrollTo(0,0);
+}
+function predPickCh(btn,qid,qi,letter){
+  var wrap=document.getElementById(qid);
+  if(!wrap||wrap.dataset.done) return;
+  wrap.dataset.done='1';
+  var correct=window.__predPaperChAns[qi];
+  var opts=wrap.querySelectorAll('.opt');
+  opts.forEach(function(ob){
+    ob.disabled=true;
+    ob.classList.remove('selected');
+    var lab=ob.querySelector('.lab').textContent.trim();
+    if(lab===correct) ob.classList.add('correct');
+    else if(ob===btn) ob.classList.add('wrong');
+    else ob.classList.add('dim');
+  });
+  var ab=wrap.querySelector('.ans-box');
+  var right=(letter===correct);
+  ab.innerHTML='<div style="padding:8px 12px;border-radius:6px;font-size:13px;'+(right?'background:#e8f8ee;color:#1e8449':'background:#fdecea;color:#c0392b')+'">'+(right?'✓ 答对了':'✗ 答错了')+' · 正确答案：<b>'+correct+'</b></div>';
+  ab.style.display='block';
+  // 计分
+  var scoreEl=document.getElementById('predScoreNum');
+  if(scoreEl){
+    var n=parseInt(scoreEl.textContent,10)||0;
+    if(right) scoreEl.textContent=n+1;
+  }
+}
+function togglePredAns(btn,id){
+  var d=document.getElementById(id);
+  if(!d) return;
+  var open=d.style.display!=='none';
+  d.style.display=open?'none':'block';
+  btn.textContent=open?'✏ 先自己写，写完点看答案':'收起答案';
 }
 
 /* ===== 考前万能答题技巧（明天上场直接套） ===== */
