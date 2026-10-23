@@ -9855,8 +9855,8 @@ function buildPredPaper(code){
       +'<div class="ans-box" style="display:none;margin-top:6px"></div>'
       +'</div>';
   });
-  // 选择题得分统计
-  h+='<div id="predScore" style="margin:14px 0;padding:10px 14px;background:#f0f4f8;border-radius:8px;font-size:14px;color:#333">选择题得分：<b id="predScoreNum">0</b> / '+ch.length+' · 每题选一项</div>';
+  // 选择题得分统计（吸顶）
+  h+='<div id="predScore" style="position:sticky;top:0;z-index:50;margin:14px 0;padding:10px 14px;background:#f0f4f8;border-radius:8px;font-size:14px;color:#333;box-shadow:0 2px 6px rgba(0,0,0,.06)">选择题得分：<b id="predScoreNum">0</b> / '+ch.length+' · 每题选一项</div>';
 
   h+='<div style="font-size:15px;font-weight:700;margin:18px 0 6px">二、简答题（本大题共 '+sh.length+' 小题，每小题 '+cfg.ss+' 分，共 '+(sh.length*cfg.ss)+' 分）</div>';
   sh.forEach(function(item,i){
@@ -9882,10 +9882,10 @@ function predPickCh(btn,qid,qi,letter){
   wrap.dataset.done='1';
   var correct=window.__predPaperChAns[qi];
   var opts=wrap.querySelectorAll('.opt');
-  opts.forEach(function(ob){
+  opts.forEach(function(ob,oi){
     ob.disabled=true;
     ob.classList.remove('selected');
-    var lab=ob.querySelector('.lab').textContent.trim();
+    var lab='ABCDEFGHIJKLMNOPQRSTUVWXYZ'[oi];
     if(lab===correct) ob.classList.add('correct');
     else if(ob===btn) ob.classList.add('wrong');
     else ob.classList.add('dim');
