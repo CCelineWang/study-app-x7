@@ -9840,6 +9840,8 @@ function buildPredPaper(code){
   h+='<div style="font-size:12.5px;color:#888;text-align:center;margin-bottom:14px">由系统从「真题预测」高频考点按出题概率排序抽取 · 参考真题题型排版 · 附参考答案</div>';
   window.__predPaperChAns = []; // 存每题正确答案字母
   h+='<div style="font-size:15px;font-weight:700;margin:14px 0 6px">一、单项选择题（本大题共 '+ch.length+' 小题，每小题 '+cfg.cs+' 分，共 '+(ch.length*cfg.cs)+' 分）</div>';
+  // 选择题得分统计（吸顶，放在选择题最前面）
+  h+='<div id="predScore" style="position:sticky;top:0;z-index:50;margin:0 0 14px;padding:10px 14px;background:#f0f4f8;border-radius:8px;font-size:14px;color:#333;box-shadow:0 2px 6px rgba(0,0,0,.06)">选择题得分：<b id="predScoreNum">0</b> / '+ch.length+' · 每题选一项</div>';
   ch.forEach(function(item,i){
     var correctLetter = String(item.a||'').trim().charAt(0).toUpperCase();
     window.__predPaperChAns.push(correctLetter);
@@ -9855,8 +9857,6 @@ function buildPredPaper(code){
       +'<div class="ans-box" style="display:none;margin-top:6px"></div>'
       +'</div>';
   });
-  // 选择题得分统计（吸顶）
-  h+='<div id="predScore" style="position:sticky;top:0;z-index:50;margin:14px 0;padding:10px 14px;background:#f0f4f8;border-radius:8px;font-size:14px;color:#333;box-shadow:0 2px 6px rgba(0,0,0,.06)">选择题得分：<b id="predScoreNum">0</b> / '+ch.length+' · 每题选一项</div>';
 
   h+='<div style="font-size:15px;font-weight:700;margin:18px 0 6px">二、简答题（本大题共 '+sh.length+' 小题，每小题 '+cfg.ss+' 分，共 '+(sh.length*cfg.ss)+' 分）</div>';
   sh.forEach(function(item,i){
