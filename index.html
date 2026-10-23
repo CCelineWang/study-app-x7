@@ -9844,12 +9844,12 @@ function buildPredPaper(code){
     var correctLetter = String(item.a||'').trim().charAt(0).toUpperCase();
     window.__predPaperChAns.push(correctLetter);
     var qid='predch-'+i;
-    h+='<div style="margin:12px 0" id="'+qid+'">'
-      +'<div style="font-size:14.5px;line-height:1.7">'+(i+1)+'. '+escHtml(item.q)+' <span style="color:#999;font-size:12px">（'+cfg.cs+'分）</span></div>'
-      +'<div class="opts" style="margin-top:8px">';
+    h+='<div class="q-card" id="'+qid+'">'
+      +'<div style="font-size:14.5px;line-height:1.7;font-weight:600">'+(i+1)+'. '+escHtml(item.q)+' <span style="color:#999;font-size:12px;font-weight:normal">（'+cfg.cs+'分）</span></div>'
+      +'<div class="opts" style="margin-top:10px">';
     (item.o||[]).forEach(function(op,oi){
       var lab='ABCDEFGHIJKLMNOPQRSTUVWXYZ'[oi];
-      h+='<button class="opt" onclick="predPickCh(this,\''+qid+'\','+i+',\''+lab+'\')" style="margin-bottom:6px"><span class="lab">'+lab+'</span><span>'+escHtml(op)+'</span></button>';
+      h+='<button class="opt" onclick="predPickCh(this,\''+qid+'\','+i+',\''+lab+'\')" style="margin-bottom:6px"><span>'+escHtml(op)+'</span></button>';
     });
     h+='</div>'
       +'<div class="ans-box" style="display:none;margin-top:6px"></div>'
@@ -9861,16 +9861,16 @@ function buildPredPaper(code){
   h+='<div style="font-size:15px;font-weight:700;margin:18px 0 6px">二、简答题（本大题共 '+sh.length+' 小题，每小题 '+cfg.ss+' 分，共 '+(sh.length*cfg.ss)+' 分）</div>';
   sh.forEach(function(item,i){
     var sid='predsh-'+i;
-    h+='<div style="margin:12px 0"><div style="font-size:14.5px;font-weight:600;line-height:1.7">'+(cfg.cn+i+1)+'. '+escHtml(item.q)+' <span style="color:#999;font-size:12px">（'+cfg.ss+'分）</span></div>'
-      +'<button onclick="togglePredAns(this,\''+sid+'\')" style="margin:6px 0 0 20px;background:#eef2f7;border:1px solid #d8dfe8;border-radius:6px;font-size:12.5px;color:#333;padding:4px 12px;cursor:pointer">✏ 先自己写，写完点看答案</button>'
-      +'<div id="'+sid+'" style="display:none;margin:6px 0 0 20px;padding:8px 12px;background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;font-size:13.5px;line-height:1.8;color:#234">'+escHtml(item.a||'')+'</div></div>';
+    h+='<div class="q-card" style="margin-bottom:10px"><div style="font-size:14.5px;font-weight:600;line-height:1.7">'+(cfg.cn+i+1)+'. '+escHtml(item.q)+' <span style="color:#999;font-size:12px;font-weight:normal">（'+cfg.ss+'分）</span></div>'
+      +'<button onclick="togglePredAns(this,\''+sid+'\')" style="margin-top:8px;background:#eef2f7;border:1px solid #d8dfe8;border-radius:6px;font-size:12.5px;color:#333;padding:4px 12px;cursor:pointer">✏ 先自己写，写完点看答案</button>'
+      +'<div id="'+sid+'" style="display:none;margin-top:8px;padding:8px 12px;background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;font-size:13.5px;line-height:1.8;color:#234">'+escHtml(item.a||'')+'</div></div>';
   });
   h+='<div style="font-size:15px;font-weight:700;margin:18px 0 6px">'+cfg.ehead+'（本大题共 '+es.length+' 小题，每小题 '+cfg.es+' 分，共 '+(es.length*cfg.es)+' 分）</div>';
   es.forEach(function(item,i){
     var eid='predes-'+i;
-    h+='<div style="margin:12px 0"><div style="font-size:14.5px;font-weight:600;line-height:1.7">'+(cfg.cn+cfg.sn+i+1)+'. '+escHtml(item.q)+' <span style="color:#999;font-size:12px">（'+cfg.es+'分）</span></div>'
-      +'<button onclick="togglePredAns(this,\''+eid+'\')" style="margin:6px 0 0 20px;background:#eef2f7;border:1px solid #d8dfe8;border-radius:6px;font-size:12.5px;color:#333;padding:4px 12px;cursor:pointer">✏ 先自己写，写完点看答案</button>'
-      +'<div id="'+eid+'" style="display:none;margin:6px 0 0 20px;padding:8px 12px;background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;font-size:13.5px;line-height:1.8;color:#234">'+escHtml(item.a||'')+'</div></div>';
+    h+='<div class="q-card" style="margin-bottom:10px"><div style="font-size:14.5px;font-weight:600;line-height:1.7">'+(cfg.cn+cfg.sn+i+1)+'. '+escHtml(item.q)+' <span style="color:#999;font-size:12px;font-weight:normal">（'+cfg.es+'分）</span></div>'
+      +'<button onclick="togglePredAns(this,\''+eid+'\')" style="margin-top:8px;background:#eef2f7;border:1px solid #d8dfe8;border-radius:6px;font-size:12.5px;color:#333;padding:4px 12px;cursor:pointer">✏ 先自己写，写完点看答案</button>'
+      +'<div id="'+eid+'" style="display:none;margin-top:8px;padding:8px 12px;background:#f0faf3;border-left:3px solid #2ecc71;border-radius:4px;font-size:13.5px;line-height:1.8;color:#234">'+escHtml(item.a||'')+'</div></div>';
   });
   h+='<div style="font-size:12px;color:#aaa;margin:20px 0 6px">说明：本卷由系统从「真题预测」按考点概率排序抽题（高概率主题优先），题目为参考真题风格拟写的模拟题，非官方真题；简答/论述为要点式参考答案，考试时请结合分值适当展开。</div>';
   box.innerHTML=h;
